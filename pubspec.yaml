@@ -1,0 +1,36 @@
+name: sched_master
+description: "Sched Master by toqoko"
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.3
+  http: ^1.3.0
+  provider: ^6.1.2
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+  - assets/icons/active/student.png
+  - assets/icons/active/teacher.png
+  - assets/icons/active/settings.png
+  - assets/icons/state/student.png
+  - assets/icons/state/teacher.png
+  - assets/icons/state/settings.png
+  - assets/error.png
