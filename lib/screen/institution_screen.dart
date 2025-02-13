@@ -54,7 +54,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
     setState(() {
       selectedInstitution = null;
       filteredInstitutions = institutions
-          .where((institution) => institution.name.toLowerCase().contains(query.toLowerCase()))
+          .where((institution) => institution.name.toLowerCase().contains(query.toLowerCase()) || institution.town.toLowerCase().contains(query.toLowerCase()) || institution.type.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -72,7 +72,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
     if (isLoading) {
       return const LoadingScreen();
     } else if (hasError) {
-      return const ErrorScreen();
+      return ErrorScreen(onRefresh: loadInstitutionsData);
     } else {
       return Scaffold(
         backgroundColor: Colors.grey[100],

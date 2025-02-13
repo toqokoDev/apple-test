@@ -5,7 +5,6 @@ class Replacements {
   final String data;
   final String day;
   final String description;
-  // final String institution;
   final Day schedule;
   final List<List<String>> replacement;
 
@@ -15,7 +14,6 @@ class Replacements {
     required this.day,
     required this.schedule,
     required this.description,
-    // required this.institution,
     required this.replacement,
   });
 
@@ -25,7 +23,6 @@ class Replacements {
       group: json['group'] as String,
       data: json['data'] as String,
       day: json['day'] as String,
-      // institution: json['institution'] as String,
       schedule: Day.fromJson(json['schedule'] as Map<String, dynamic>),
       replacement: (json['replacement'] as List<dynamic>)
           .map((e) => (e as List<dynamic>).map((s) => s as String).toList())
@@ -35,7 +32,6 @@ class Replacements {
 
   Map<String, dynamic> toJson() {
     return {
-      // 'institution': institution,
       'description': description,
       'group': group,
       'data': data,

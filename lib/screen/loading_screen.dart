@@ -12,6 +12,8 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late List<Animation<double>> _animations;
+  late List<Animation<double>> _scaleAnimations;
+  late List<Animation<Offset>> _positionAnimations;
 
   @override
   void initState() {
@@ -28,6 +30,33 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
           index * 0.2,
           1.0,
           curve: Curves.easeInOut,
+        ),
+      );
+    });
+
+    _scaleAnimations = List.generate(3, (index) {
+      return CurvedAnimation(
+        parent: _controller,
+        curve: Interval(
+          index * 0.2,
+          1.0,
+          curve: Curves.elasticOut,
+        ),
+      );
+    });
+
+    _positionAnimations = List.generate(3, (index) {
+      return Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(0.0, -0.2),
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.2,
+            1.0,
+            curve: Curves.elasticOut,
+          ),
         ),
       );
     });
@@ -50,13 +79,19 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
             return AnimatedBuilder(
               animation: _animations[index],
               builder: (context, child) {
-                return Opacity(
-                  opacity: _animations[index].value,
-                  child: const Dot(size: 10.0, color: Colors.black, opacity: 1.0),
+                return Transform.scale(
+                  scale: _scaleAnimations[index].value * 1.2,
+                  child: Opacity(
+                    opacity: _animations[index].value,
+                    child: SlideTransition(
+                      position: _positionAnimations[index],
+                      child: const Dot(size: 10.0, color: Colors.black, opacity: 1.0),
+                    ),
+                  ),
                 );
               },
             );
-          }).expand((widget) => [widget, const SizedBox(width: 10.0)]).toList()..removeLast(),
+          }).expand((widget) => [widget, const SizedBox(width: 15.0)]).toList()..removeLast(),
         ),
       ),
     );

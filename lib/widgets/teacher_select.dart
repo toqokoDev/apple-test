@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:sched_master/class/institution.dart';
+import 'package:sched_master/class/server.dart';
 import 'package:sched_master/class/teacher.dart';
 import 'package:sched_master/class/teacher_replacements.dart';
 import 'package:sched_master/services/server.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:sched_master/widgets/action_button.dart';
 import 'package:sched_master/screen/loading_screen.dart';
 import 'package:sched_master/screen/error_screen.dart';
 
-
-class DropDownTeacherSetting extends StatefulWidget {
+class DropDownTeacher extends StatefulWidget {
   final List<Teacher> data;
   final Widget Function(Teacher) scheduleScreen;
   final Widget Function(List<TeacherReplacements>) replacementsScreen;
 
-  const DropDownTeacherSetting({
+  const DropDownTeacher({
     super.key,
     required this.data,
     required this.scheduleScreen,
@@ -21,161 +24,230 @@ class DropDownTeacherSetting extends StatefulWidget {
   });
 
   @override
-  State<DropDownTeacherSetting> createState() => _DropDownTeacherSettingState();
+  State<DropDownTeacher> createState() => _DropDownTeacherState();
 }
 
-class _DropDownTeacherSettingState extends State<DropDownTeacherSetting> {
+class _DropDownTeacherState extends State<DropDownTeacher> {
   String? selectedTeacher;
   bool _isLoading = false;
   bool _isError = false;
+  Institution? selectedInstitution;
 
   @override
   void initState() {
     super.initState();
-    _loadSelectedGroup();
+    _loadSelectedTeacher();
   }
 
-  Future<void> _loadSelectedGroup() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedInstitution ??= Provider.of<Server>(context, listen: false).institution;
+  }
+
+  Future<void> _loadSelectedTeacher() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedTeacher = prefs.getString('selectedTeacher');
-    });
+    setState(() => selectedTeacher = prefs.getString('selectedTeacher'));
   }
 
-  Future<void> _saveSelectedGroup(String? group) async {
+  Future<void> _saveSelectedTeacher(String teacher) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedTeacher', group ?? '');
+    await prefs.setString('selectedTeacher', teacher);
   }
 
-  Future<void> _handleButtonPress() async {
-    if (selectedTeacher == null) return;
-
-    setState(() => _isLoading = true);
+  Future<void> _fetchReplacements() async {
+    if (selectedTeacher == null || selectedInstitution == null) return;
+    setState(() {_isLoading = true; _isError = false;});
 
     try {
-      List<TeacherReplacements> replacements = await getTeacherReplacement(selectedTeacher!);
-
+      final replacements = await getTeacherReplacement(selectedTeacher!, selectedInstitution!);
       if (mounted) {
         await Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => widget.replacementsScreen(replacements),
-          ),
+          MaterialPageRoute(builder: (context) => widget.replacementsScreen(replacements)),
         );
       }
-    } catch (error) {
-      setState(() => _isError = true);
+    } catch (_) {
+      if (mounted) setState(() => _isError = true);
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
-  
+
+  void _showTeacherSelectionScreen() {
+    List<Teacher> testTeachers = [
+      Teacher(days: [], name: "Иванов Иван Иванович"),
+      Teacher(days: [], name: "Петров Петр Петрович"),
+      Teacher(days: [], name: "Сидорова Мария Алексеевна"),
+      Teacher(days: [], name: "Кузнецов Алексей Викторович"),
+      Teacher(days: [], name: "Васильева Анна Сергеевна"),
+      Teacher(days: [], name: "Морозов Дмитрий Олегович"),
+      Teacher(days: [], name: "Федорова Наталья Владимировна"),
+      Teacher(days: [], name: "Семенов Артем Павлович"),
+      Teacher(days: [], name: "Алексеева Ольга Геннадьевна"),
+      Teacher(days: [], name: "Григорьев Сергей Николаевич"),
+    ];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _TeacherSelectionScreen(
+          teachers: testTeachers,
+          initialSelection: selectedTeacher,
+          onSelected: (teacher) {
+            setState(() => selectedTeacher = teacher.name);
+            _saveSelectedTeacher(teacher.name);
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: LoadingScreen());
-    } else if (_isError) {
-      return const Center(child: ErrorScreen());
-    }
+    if (_isLoading) return const Center(child: LoadingScreen());
+    if (_isError) return Center(child: ErrorScreen(onRefresh: _fetchReplacements));
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const Text(
-            'Выберите преподавателя:',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(103, 103, 103, 1)),
-          ),
-          const SizedBox(height: 5),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: DropdownButton<String>(
-                value: selectedTeacher,
-                isExpanded: true,
-                hint: const Text('Выберите преподавателя'),
-                underline: const SizedBox.shrink(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedTeacher = newValue;
-                  });
-                  _saveSelectedGroup(newValue);
-                },
-                items: widget.data.map<DropdownMenuItem<String>>((Teacher teacher) {
-                  return DropdownMenuItem<String>(
-                    value: teacher.name,
-                    child: Text(teacher.name),
-                  );
-                }).toList(),
+        children: [
+          Container(
+              padding: const EdgeInsets.all(0.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
+              child: ListTile(
+              title: Text(selectedTeacher ?? "Выберите преподавателя", textAlign: TextAlign.left),
+              trailing: const Icon(Icons.arrow_drop_down, size: 30),
+              onTap: _showTeacherSelectionScreen,
             ),
-          ),
+            ),
+          const SizedBox(height: 30),
+          if (selectedInstitution?.schedule ?? false)
+            ActionButton(
+              icon: Icons.schedule,
+              label: 'Получить расписание',
+              enabled: selectedTeacher != null,
+              onPressed: () {
+                final teacher = widget.data.firstWhere((t) => t.name == selectedTeacher);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => widget.scheduleScreen(teacher)),
+                );
+              },
+            ),
           const SizedBox(height: 20),
-          AnimatedOpacity(
-            opacity: selectedTeacher != null ? 1.0 : 0.5,
-            duration: const Duration(milliseconds: 300),
-            child: ElevatedButton.icon(
-              onPressed: selectedTeacher != null
-                  ? () {
-                      final scheduleTeacher = widget.data.firstWhere(
-                        (scheduleTeacher) => scheduleTeacher.name == selectedTeacher,
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => widget.scheduleScreen(scheduleTeacher),
-                        ),
-                      );
-                    }
-                  : null,
-              icon: const Icon(Icons.schedule, color: Colors.white),
-              label: const Text(
-                'Получить расписание',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 6,
-                shadowColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                backgroundColor: selectedTeacher != null ? Colors.black : Colors.grey,
-              ),
+          if (selectedInstitution?.replacement ?? false)
+            ActionButton(
+              icon: Icons.update,
+              label: 'Получить замены',
+              enabled: selectedTeacher != null,
+              onPressed: _fetchReplacements,
             ),
-          ),
-          const SizedBox(height: 20),
-          AnimatedOpacity(
-            opacity: selectedTeacher != null ? 1.0 : 0.5,
-            duration: const Duration(milliseconds: 300),
-            child: ElevatedButton.icon(
-              onPressed: selectedTeacher != null
-                  ? () async {
-                      _handleButtonPress();
-                    }
-                  : null,
-              icon: const Icon(Icons.update, color: Colors.white),
-              label: const Text('Получить замены', style: TextStyle(color: Colors.white, fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 6,
-                shadowColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                backgroundColor: selectedTeacher != null ? Colors.black : Colors.grey,
-              ),
-            ),
-          )
         ],
+      ),
+    );
+  }
+}
+
+class _TeacherSelectionScreen extends StatefulWidget {
+  final List<Teacher> teachers;
+  final String? initialSelection;
+  final Function(Teacher) onSelected;
+
+  const _TeacherSelectionScreen({
+    required this.teachers,
+    required this.initialSelection,
+    required this.onSelected,
+  });
+
+  @override
+  _TeacherSelectionScreenState createState() => _TeacherSelectionScreenState();
+}
+
+class _TeacherSelectionScreenState extends State<_TeacherSelectionScreen> {
+  TextEditingController searchController = TextEditingController();
+  List<Teacher> filteredTeachers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredTeachers = List.from(widget.teachers);
+  }
+
+  void filterSearchResults(String query) {
+    setState(() => filteredTeachers = widget.teachers
+        .where((teacher) => teacher.name.toLowerCase().contains(query.toLowerCase()))
+        .toList());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: const Text(
+          'Выберите преподавателя',
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            color: Colors.black,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+                controller: searchController,
+                onChanged: filterSearchResults,
+                decoration: InputDecoration(
+                hintText: 'Поиск...',
+                hintStyle: TextStyle(fontFamily: 'Roboto', color: Colors.grey[600]),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.separated(
+                itemCount: filteredTeachers.length,
+                separatorBuilder: (_, __) => Divider(color: Colors.grey[300]),
+                itemBuilder: (context, index) {
+                  final teacher = filteredTeachers[index];
+                  return ListTile(
+                    title: Text(teacher.name, style: const TextStyle(fontSize: 16)),
+                    onTap: () {
+                      widget.onSelected(teacher);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

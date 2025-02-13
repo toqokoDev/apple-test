@@ -10,7 +10,7 @@ import 'package:sched_master/constants/api.dart';
 import 'package:sched_master/class/schedule.dart';
 import 'package:sched_master/class/replacements.dart';
 
-Future<List<Schedule>> getGroupData() async {
+Future<List<Schedule>> getGroupData(Institution institution) async {
   try {
     final response = await http.get(
       Uri.parse(Api.getScheduleData),
@@ -28,7 +28,7 @@ Future<List<Schedule>> getGroupData() async {
   }
 }
 
-Future<List<Replacements>> getReplacement(String group) async {
+Future<List<Replacements>> getReplacement(String group, Institution institution) async {
   try {
     final response = await http.get(
       Uri.parse("${Api.getReplacementData}?group=$group"),
@@ -40,14 +40,14 @@ Future<List<Replacements>> getReplacement(String group) async {
 
     final String responseBody = utf8.decode(response.bodyBytes);
     final List<dynamic> responseData = json.decode(responseBody);
-
+    
     return responseData.map((data) => Replacements.fromJson(data)).toList();
   } catch (e) {
     throw Exception('Failed to Replacement load data');
   }
 }
 
-Future<List<Teacher>> getTeacherData() async {
+Future<List<Teacher>> getTeacherData(Institution institution) async {
   try {
     final response = await http.get(
       Uri.parse(Api.getTeacherData),
@@ -87,8 +87,8 @@ Future<Institution> getInstitutionData(String institutionID) async {
 Future<ServerData?> getData(String institutionID) async {
   try {
     Institution institution = await getInstitutionData(institutionID);
-    List<Schedule> schedules = await getGroupData();
-    List<Teacher> teachers = await getTeacherData();
+    List<Schedule> schedules = await getGroupData(institution);
+    List<Teacher> teachers = await getTeacherData(institution);
 
     return ServerData(institution: institution, scheduleData: schedules, teacher: teachers);
   } catch (e) {
@@ -96,7 +96,7 @@ Future<ServerData?> getData(String institutionID) async {
   }
 }
 
-Future<List<TeacherReplacements>> getTeacherReplacement(String name) async {
+Future<List<TeacherReplacements>> getTeacherReplacement(String name, Institution institution) async {
   try {
     final response = await http.get(
       Uri.parse("${Api.getTeacherReplacementData}?teacher=$name"),

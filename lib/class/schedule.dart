@@ -1,5 +1,4 @@
 class Schedule {
-  // final String institution;
   final String group;
   final String course;
   final List<Day> days;
@@ -8,7 +7,6 @@ class Schedule {
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
-      // institution: json['institution'] as String,
       group: json['group'] as String,
       course: json['course'] as String,
       days: (json['days'] as List<dynamic>).map((day) => Day.fromJson(day as Map<String, dynamic>)).toList(),
@@ -17,7 +15,6 @@ class Schedule {
 
   Map<String, dynamic> toJson() {
     return {
-      // 'institution': institution,
       'group': group,
       'course': course,
       'days': days.map((day) => day.toJson()).toList(),
@@ -68,39 +65,20 @@ class Par {
 }
 
 class Lesson {
-  final LessonDetails up;
-  final LessonDetails down;
+  final String label;
+  final String audience;
+  final String teacher;
+  Null group;
   final String time;
 
-  Lesson({required this.up, required this.down, required this.time});
+  Lesson({required this.label, required this.audience, required this.teacher, required this.time});
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
     return Lesson(
-      up: LessonDetails.fromJson(json['up'] as Map<String, dynamic>),
-      down: LessonDetails.fromJson(json['down'] as Map<String, dynamic>),
-      time: json['time'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'up': up.toJson(),
-      'down': down.toJson(),
-      'time': time,
-    };
-  }
-}
-
-class LessonDetails {
-  final String label;
-  final String audience;
-
-  LessonDetails({required this.label, required this.audience});
-
-  factory LessonDetails.fromJson(Map<String, dynamic> json) {
-    return LessonDetails(
       label: json['label'] as String,
       audience: json['audience'] as String,
+      teacher: json['teacher'].join(", ") as String,
+      time: json['time'] as String,
     );
   }
 
@@ -108,6 +86,8 @@ class LessonDetails {
     return {
       'label': label,
       'audience': audience,
+      'teacher': teacher.split(","),
+      'time': time
     };
   }
 }

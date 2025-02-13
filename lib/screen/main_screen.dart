@@ -32,6 +32,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void loadData() async {
+    setState(() {
+      isLoading = true;
+      hasError = false;
+    });
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String selectedInstitutionID = prefs.getString('selectedInstitutionID') ?? "0";
@@ -56,7 +60,7 @@ class _MainScreenState extends State<MainScreen> {
     if (isLoading) {
       return const LoadingScreen();
     } else if (hasError) {
-      return const ErrorScreen();
+      return ErrorScreen(onRefresh: loadData);
     }
     return Scaffold(
       backgroundColor: const Color.fromRGBO(245, 245, 245, 1),

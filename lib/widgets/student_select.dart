@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sched_master/widgets/action_button.dart';
+import 'package:sched_master/widgets/custom_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:sched_master/class/institution.dart';
+import 'package:sched_master/class/server.dart';
 import 'package:sched_master/class/replacements.dart';
 import 'package:sched_master/class/schedule.dart';
-
 import 'package:sched_master/services/server.dart';
-
 import 'package:sched_master/screen/loading_screen.dart';
 import 'package:sched_master/screen/error_screen.dart';
 
-List<String> courses = ['Первый курс', 'Второй курс', 'Третий курс', 'Четвертый курс'];
-
-class DropDownStudentSetting extends StatefulWidget {
+class DropDownStudent extends StatefulWidget {
   final List<Schedule> data;
   final Widget Function(Schedule) scheduleScreen;
   final Widget Function(List<Replacements>) replacementsScreen;
 
-  const DropDownStudentSetting({
+  const DropDownStudent({
     super.key,
     required this.data,
     required this.scheduleScreen,
@@ -24,214 +25,127 @@ class DropDownStudentSetting extends StatefulWidget {
   });
 
   @override
-  State<DropDownStudentSetting> createState() => _DropDownStudentSettingState();
+  State<DropDownStudent> createState() => _DropDownStudentState();
 }
 
-class _DropDownStudentSettingState extends State<DropDownStudentSetting> {
+class _DropDownStudentState extends State<DropDownStudent> {
   String? selectedCourse;
   String? selectedGroup;
   bool _isLoading = false;
   bool _isError = false;
+  Institution? selectedInstitution;
 
   @override
   void initState() {
     super.initState();
-    _loadSelectedCourse();
-    _loadSelectedGroup();
+    _loadPreferences();
   }
 
-  Future<void> _loadSelectedCourse() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedInstitution ??= Provider.of<Server>(context, listen: false).institution;
+  }
+
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       selectedCourse = prefs.getString('selectedCourse');
-    });
-  }
-
-  Future<void> _loadSelectedGroup() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
       selectedGroup = prefs.getString('selectedGroup');
     });
   }
 
-  Future<void> _saveSelectedCourse(String? course) async {
+  Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedCourse', course ?? '');
+    await prefs.setString(key, value ?? '');
   }
 
-  Future<void> _saveSelectedGroup(String? group) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedGroup', group ?? '');
-  }
-
-  Future<void> _handleButtonPress() async {
-    if (selectedGroup == null) return;
-
+  Future<void> _handleReplacements() async {
+    if (selectedGroup == null || selectedInstitution == null) return;
     setState(() => _isLoading = true);
-
+    
     try {
-      List<Replacements> replacements = await getReplacement(selectedGroup!);
-
+      final replacements = await getReplacement(selectedGroup!, selectedInstitution!);
       if (mounted) {
         await Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => widget.replacementsScreen(replacements),
-          ),
+          MaterialPageRoute(builder: (context) => widget.replacementsScreen(replacements)),
         );
       }
-    } catch (error) {
+    } catch (_) {
       setState(() => _isError = true);
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: LoadingScreen());
-    } else if (_isError) {
-      return const Center(child: ErrorScreen());
-    }
+    if (_isLoading) return const Center(child: LoadingScreen());
+    if (_isError) return Center(child: ErrorScreen(onRefresh: _handleReplacements));
 
-    List<Schedule> filteredGroups = widget.data
-        .where((schedule) => selectedCourse == null || schedule.course == selectedCourse)
-        .toList();
-        
+    final filteredGroups = widget.data.where((s) => selectedCourse == null || s.course == selectedCourse).toList();
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const Text(
-            'Выберите раздел:',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(103, 103, 103, 1)),
+        children: [
+          CustomDropdown(
+            label: 'Выберите курс:',
+            value: selectedCourse,
+            items: courses,
+            onChanged: (value) {
+              setState(() {
+                selectedCourse = value;
+                selectedGroup = null;
+              });
+              _savePreference('selectedCourse', value);
+            },
+            enabled: true,
           ),
-          const SizedBox(height: 5),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: DropdownButton<String>(
-                value: selectedCourse,
-                isExpanded: true,
-                hint: const Text('Выберите раздел'),
-                underline: const SizedBox.shrink(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedCourse = newValue;
-                    selectedGroup = null;
-                  });
-                  _saveSelectedCourse(newValue);
-                },
-                items: courses.map<DropdownMenuItem<String>>((String course) {
-                  return DropdownMenuItem<String>(
-                    value: course,
-                    child: Text(course),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
+
           const SizedBox(height: 20),
-          const Text(
-            'Выберите группу:',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(103, 103, 103, 1)),
+
+          CustomDropdown(
+            label: 'Выберите группу:',
+            value: selectedGroup,
+            items: filteredGroups.map((s) => s.group).toList(),
+            onChanged: (value) {
+              setState(() => selectedGroup = value);
+              _savePreference('selectedGroup', value);
+            },
+            enabled: selectedCourse == null ? false : true,
           ),
-          const SizedBox(height: 5),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: DropdownButton<String>(
-                value: selectedGroup,
-                isExpanded: true,
-                hint: const Text('Выберите группу'),
-                underline: const SizedBox.shrink(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedGroup = newValue;
-                  });
-                  _saveSelectedGroup(newValue);
-                },
-                items: filteredGroups.map<DropdownMenuItem<String>>((Schedule group) {
-                  return DropdownMenuItem<String>(
-                    value: group.group,
-                    child: Text(group.group),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
+
           const SizedBox(height: 20),
-          AnimatedOpacity(
-            opacity: selectedGroup != null ? 1.0 : 0.5,
-            duration: const Duration(milliseconds: 300),
-            child: ElevatedButton.icon(
-              onPressed: selectedGroup != null
-                  ? () {
-                      final scheduleGroup = widget.data.firstWhere(
-                        (scheduleGroup) => scheduleGroup.group == selectedGroup,
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => widget.scheduleScreen(scheduleGroup),
-                        ),
-                      );
-                    }
-                  : null,
-              icon: const Icon(Icons.schedule, color: Colors.white),
-              label: const Text(
-                'Получить расписание',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 6,
-                shadowColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                backgroundColor: selectedGroup != null ? Colors.black : Colors.grey,
-              ),
-            ),
+          
+          if (selectedInstitution?.schedule ?? false) ActionButton(
+            icon: Icons.schedule,
+            label: 'Получить расписание',
+            enabled: selectedGroup != null,
+            onPressed: () {
+              final scheduleGroup = widget.data.firstWhere((s) => s.group == selectedGroup);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => widget.scheduleScreen(scheduleGroup)),
+              );
+            },
           ),
+          
           const SizedBox(height: 20),
-          AnimatedOpacity(
-            opacity: selectedGroup != null ? 1.0 : 0.5,
-            duration: const Duration(milliseconds: 300),
-            child: ElevatedButton.icon(
-              onPressed: selectedGroup != null
-                  ? () async {
-                      _handleButtonPress();
-                    }
-                  : null,
-              icon: const Icon(Icons.update, color: Colors.white),
-              label: const Text('Получить замены', style: TextStyle(color: Colors.white, fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 6,
-                shadowColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                backgroundColor: selectedGroup != null ? Colors.black : Colors.grey,
-              ),
-            ),
-          )
+          
+          if (selectedInstitution?.replacement ?? false) ActionButton(
+            icon: Icons.update,
+            label: 'Получить замены',
+            enabled: selectedGroup != null,
+            onPressed: _handleReplacements
+          ),
         ],
       ),
     );
   }
 }
+
+const List<String> courses = ['Первый курс', 'Второй курс', 'Третий курс', 'Четвертый курс'];
