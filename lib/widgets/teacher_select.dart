@@ -75,24 +75,11 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
   }
 
   void _showTeacherSelectionScreen() {
-    List<Teacher> testTeachers = [
-      Teacher(days: [], name: "Иванов Иван Иванович"),
-      Teacher(days: [], name: "Петров Петр Петрович"),
-      Teacher(days: [], name: "Сидорова Мария Алексеевна"),
-      Teacher(days: [], name: "Кузнецов Алексей Викторович"),
-      Teacher(days: [], name: "Васильева Анна Сергеевна"),
-      Teacher(days: [], name: "Морозов Дмитрий Олегович"),
-      Teacher(days: [], name: "Федорова Наталья Владимировна"),
-      Teacher(days: [], name: "Семенов Артем Павлович"),
-      Teacher(days: [], name: "Алексеева Ольга Геннадьевна"),
-      Teacher(days: [], name: "Григорьев Сергей Николаевич"),
-    ];
-
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => _TeacherSelectionScreen(
-          teachers: testTeachers,
+          teachers: widget.data,
           initialSelection: selectedTeacher,
           onSelected: (teacher) {
             setState(() => selectedTeacher = teacher.name);

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "404297382123",
+    "project_id": "sched-master-f29f9",
+    "storage_bucket": "sched-master-f29f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404297382123:android:3b99524d454936c60566ae",
+        "android_client_info": {
+          "package_name": "com.example.sched_master"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2fYxe77y_ARCb_k4Pj9v69u93jWU6Nt0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
