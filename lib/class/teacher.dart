@@ -41,21 +41,21 @@ class Day {
 }
 
 class Par {
-  final num number;
+  final String name;
   final List<Lesson> lessons;
 
-  Par({required this.number, required this.lessons});
+  Par({required this.name, required this.lessons});
 
   factory Par.fromJson(Map<String, dynamic> json) {
     return Par(
-      number: json['number'] as num,
+      name: json['name'] as String,
       lessons: (json['lessons'] as List<dynamic>).map((lesson) => Lesson.fromJson(lesson as Map<String, dynamic>)).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'number': number,
+      'name': name,
       'lessons': lessons.map((lesson) => lesson.toJson()).toList(),
     };
   }

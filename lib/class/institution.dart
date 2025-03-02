@@ -3,7 +3,9 @@ class Institution {
   final String name;
   final String type;
   final String town;
+  final num timeLesson;
   final bool replacement;
+  final bool history;
   final bool schedule;
 
   Institution({
@@ -11,7 +13,9 @@ class Institution {
     required this.name,
     required this.type,
     required this.town, 
+    required this.timeLesson, 
     required this.replacement, 
+    required this.history,
     required this.schedule
     });
 
@@ -21,7 +25,9 @@ class Institution {
       name: json['name'] as String,
       type: json['type'] as String,
       town: json['town'] as String,
+      timeLesson: json['time_lesson'] as num,
       replacement: json['replacement'] as bool,
+      history: json['history'] as bool,
       schedule: json['schedule'] as bool,
     );
   }
@@ -33,6 +39,7 @@ class Institution {
       'type': type,
       'town': town,
       'replacement': replacement,
+      'history': history,
       'schedule': schedule
     };
   }

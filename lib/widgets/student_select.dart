@@ -66,6 +66,7 @@ class _DropDownStudentState extends State<DropDownStudent> {
     
     try {
       final replacements = await getReplacement(selectedGroup!, selectedInstitution!);
+
       if (mounted) {
         await Navigator.push(
           context,
@@ -84,7 +85,7 @@ class _DropDownStudentState extends State<DropDownStudent> {
     if (_isLoading) return const Center(child: LoadingScreen());
     if (_isError) return Center(child: ErrorScreen(onRefresh: _handleReplacements));
 
-    final filteredGroups = widget.data.where((s) => selectedCourse == null || s.course == selectedCourse).toList();
+    final filteredGroups = widget.data.where((s) => selectedCourse == null || s.type == selectedCourse).toList();
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -111,7 +112,7 @@ class _DropDownStudentState extends State<DropDownStudent> {
           CustomDropdown(
             label: 'Выберите группу:',
             value: selectedGroup,
-            items: filteredGroups.map((s) => s.group).toList(),
+            items: filteredGroups.map((s) => s.name).toList(),
             onChanged: (value) {
               setState(() => selectedGroup = value);
               _savePreference('selectedGroup', value);
@@ -119,14 +120,14 @@ class _DropDownStudentState extends State<DropDownStudent> {
             enabled: selectedCourse == null ? false : true,
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
           
           if (selectedInstitution?.schedule ?? false) ActionButton(
             icon: Icons.schedule,
             label: 'Получить расписание',
             enabled: selectedGroup != null,
             onPressed: () {
-              final scheduleGroup = widget.data.firstWhere((s) => s.group == selectedGroup);
+              final scheduleGroup = widget.data.firstWhere((s) => s.name == selectedGroup);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => widget.scheduleScreen(scheduleGroup)),

@@ -109,7 +109,7 @@ class TeacherWatchScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: Text(
-                          '${par.number}',
+                          par.name,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -189,9 +189,9 @@ class ReplacementsWatchScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
+                      padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        'Замены на ${day.data}(${day.day})',
+                        'Замены на ${day.data} (${day.day})',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -204,11 +204,11 @@ class ReplacementsWatchScreen extends StatelessWidget {
                     else
                       ReplacementCard(day: day),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
                       child: Text(
-                        'Расписание на “${day.day}” с учетом замен',
-                        style: const TextStyle(
+                        'Обновленное расписание',
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(64, 64, 64, 1),

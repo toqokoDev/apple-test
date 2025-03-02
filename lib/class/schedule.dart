@@ -1,22 +1,22 @@
 class Schedule {
-  final String group;
-  final String course;
+  final String name;
+  final String type;
   final List<Day> days;
 
-  Schedule({required this.group, required this.course, required this.days});
+  Schedule({required this.name, required this.type, required this.days});
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
-      group: json['group'] as String,
-      course: json['course'] as String,
+      name: json['name'] as String,
+      type: json['type'] as String,
       days: (json['days'] as List<dynamic>).map((day) => Day.fromJson(day as Map<String, dynamic>)).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'group': group,
-      'course': course,
+      'name': name,
+      'type': type,
       'days': days.map((day) => day.toJson()).toList(),
     };
   }
@@ -44,21 +44,21 @@ class Day {
 }
 
 class Par {
-  final num number;
+  final String name;
   final List<Lesson> lessons;
 
-  Par({required this.number, required this.lessons});
+  Par({required this.name, required this.lessons});
 
   factory Par.fromJson(Map<String, dynamic> json) {
     return Par(
-      number: json['number'] as num,
+      name: json['name'] as String,
       lessons: (json['lessons'] as List<dynamic>).map((lesson) => Lesson.fromJson(lesson as Map<String, dynamic>)).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'number': number,
+      'name': name,
       'lessons': lessons.map((lesson) => lesson.toJson()).toList(),
     };
   }
@@ -67,17 +67,17 @@ class Par {
 class Lesson {
   final String label;
   final String audience;
-  final String teacher;
+  final String teachers;
   Null group;
   final String time;
 
-  Lesson({required this.label, required this.audience, required this.teacher, required this.time});
+  Lesson({required this.label, required this.audience, required this.teachers, required this.time});
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
     return Lesson(
       label: json['label'] as String,
       audience: json['audience'] as String,
-      teacher: json['teacher'].join(", ") as String,
+      teachers: json['teachers'].join(", ") as String,
       time: json['time'] as String,
     );
   }
@@ -86,7 +86,7 @@ class Lesson {
     return {
       'label': label,
       'audience': audience,
-      'teacher': teacher.split(","),
+      'teachers': teachers.split(","),
       'time': time
     };
   }

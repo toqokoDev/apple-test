@@ -7,10 +7,10 @@ class CustomDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   final bool enabled;
 
-    const CustomDropdown({
+  const CustomDropdown({
     super.key,
     required this.label,
-    required this.value,
+    this.value, // По умолчанию null (ничего не выбрано)
     required this.items,
     required this.onChanged,
     this.enabled = true,
@@ -25,34 +25,47 @@ class CustomDropdown extends StatelessWidget {
           label,
           style: const TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: Color.fromRGBO(103, 103, 103, 1),
           ),
         ),
-        const SizedBox(height: 5),
-        Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              hint: Text(label.replaceAll(":", "")),
-              underline: const SizedBox.shrink(),
-              onChanged: enabled ? onChanged : null,
-              items: items.map((item) {
-                return DropdownMenuItem(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-              disabledHint: Text(
-                value ?? label.replaceAll(":", ""),
-                style: const TextStyle(color: Colors.grey),
-              ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          value: value,
+          isExpanded: true,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            filled: true,
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.grey, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.grey, width: 1),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.grey, width: 1),
             ),
           ),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
+          hint: Text( 
+            label.replaceAll(":", ""),
+            style: const TextStyle(color: Colors.grey),
+          ),
+          onChanged: enabled ? onChanged : null,
+          items: items.map((item) {
+            return DropdownMenuItem(
+              value: item,
+              child: Text(
+                item,
+                style: TextStyle(color: enabled ? Colors.black : Colors.grey),
+              ),
+            );
+          }).toList(),
+          dropdownColor: Colors.white,
         ),
       ],
     );

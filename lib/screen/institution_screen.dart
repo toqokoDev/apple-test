@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sched_master/class/institution.dart';
 import 'package:sched_master/screen/error_screen.dart';
 import 'package:sched_master/screen/loading_screen.dart';
 import 'package:sched_master/services/server.dart';
+import 'package:sched_master/utils/ethernet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectInstitutionScreen extends StatefulWidget {
@@ -32,7 +34,20 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
         isLoading = true;
         hasError = false;
       });
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      
+      final notificationQueue = Hive.box<bool>('notificationQueue');
+    
+      if (notificationQueue.isNotEmpty) {
+        notificationQueue.clear();
+      }
+
+      await sendDeleteRequestToServer();
+
       institutions = await loadInstitutions();
+
       setState(() {
         filteredInstitutions = List.from(institutions);
         isLoading = false;
@@ -75,20 +90,82 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
       return ErrorScreen(onRefresh: loadInstitutionsData);
     } else {
       return Scaffold(
-        backgroundColor: Colors.grey[100],
+        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
         appBar: AppBar(
-          title: const Text(
-            'Выберите заведение',
-            style: TextStyle(
-              fontFamily: 'Roboto',
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Выберите заведение',
+                style: TextStyle(
+                fontFamily: 'Roboto',
+                color: Colors.black,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.info, color: Colors.black, size: 30.0),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        title: const Text(
+                          'Не нашли заведение?',
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                'Напишите нам в Telegram, и мы добавим его!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16, color: Colors.black87),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Column(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.telegram, color: Colors.blueAccent, size: 50.0),
+                                  onPressed: () => launchURL('https://t.me/sched_master'),
+                                ),
+                                const Text(
+                                  'Связаться в Telegram',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black54),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.black,
+                              textStyle: const TextStyle(fontSize: 16),
+                            ),
+                            child: const Text('Закрыть'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
           ),
           backgroundColor: Colors.white,
           elevation: 0.5,
-          centerTitle: true,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -135,7 +212,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color.fromARGB(255, 0, 0, 0) : Colors.white,
+                          color: isSelected ?const Color.fromARGB(255, 100, 142, 161) : Colors.white,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(

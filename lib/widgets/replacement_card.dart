@@ -11,11 +11,11 @@ class ReplacementCard extends StatelessWidget {
       color: Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(12.0),
       ),
       elevation: 5.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -89,7 +89,7 @@ class ReplacementCard extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              replacement[1],
+                              replacement.number,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 14,
@@ -100,7 +100,7 @@ class ReplacementCard extends StatelessWidget {
                           Expanded(
                             flex: 3,
                             child: Text(
-                              replacement[3],
+                              replacement.newLabel,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 14,
@@ -111,7 +111,7 @@ class ReplacementCard extends StatelessWidget {
                           Expanded(
                             flex: 3,
                             child: Text(
-                              replacement[5],
+                              replacement.oldLabel,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 14,
@@ -122,7 +122,7 @@ class ReplacementCard extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              replacement[2],
+                              replacement.newAudience,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 14,

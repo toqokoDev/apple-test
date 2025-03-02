@@ -73,39 +73,39 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/state/teacher.png',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             ),
             activeIcon: Image.asset(
               'assets/icons/active/teacher.png',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             ),
             label: 'Преподаватель',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/state/student.png',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             ),
             activeIcon: Image.asset(
               'assets/icons/active/student.png',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             ),
             label: 'Студент',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/state/settings.png',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             ),
             activeIcon: Image.asset(
               'assets/icons/active/settings.png',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             ),
             label: 'Настройки',
           )
@@ -118,8 +118,8 @@ class _MainScreenState extends State<MainScreen> {
             _selectedIndex = index;
           });
         },
-        selectedFontSize: 13,
-        unselectedFontSize: 13,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:sched_master/services/notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,9 @@ void main() async {
   var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  await Hive.initFlutter();
+  await Hive.openBox<bool>('notificationQueue');
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? selectedInstitution = prefs.getString('selectedInstitutionID');
@@ -48,10 +52,6 @@ class MyApp extends StatelessWidget {
         '/main': (context) => const MainScreen(),
       },
       title: 'SchedMaster',
-      theme: ThemeData(
-        primaryColor: const Color.fromRGBO(70, 168, 248, 1),
-        scaffoldBackgroundColor: Colors.white,
-      ),
       home: showSelectInstitution 
           ? const SelectInstitutionScreen()
           : const MainScreen(),

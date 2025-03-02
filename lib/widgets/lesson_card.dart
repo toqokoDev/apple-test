@@ -30,15 +30,25 @@ class LessonCard extends StatelessWidget {
               children: lessons.map((lesson) {
                 final lessonTime = parseTime(lesson.time.split("-")[0]);
                 final lessonEndTime = lessonTime.add(const Duration(minutes: 45));
-                final isCurrentTime =
-                    currentTime.isAfter(lessonTime) && currentTime.isBefore(lessonEndTime);
+                final currentOnlyTime = DateTime(0, 0, 0, currentTime.hour, currentTime.minute);
+                final isCurrentTime = currentOnlyTime.isAfter(lessonTime) && currentOnlyTime.isBefore(lessonEndTime);
 
                 final isCurrentLesson = isCurrentDay && isCurrentTime;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Container(
-                    color: isCurrentLesson ? Colors.yellow : Colors.white,
+                    decoration: BoxDecoration(
+                      gradient: isCurrentLesson
+                          ? const LinearGradient(
+                              colors: [Colors.blueAccent, Colors.lightBlue],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : null,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    padding: isCurrentLesson ? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0) : null,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -48,9 +58,10 @@ class LessonCard extends StatelessWidget {
                               SizedBox(
                                 child: Text(
                                   lesson.time,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.black,
+                                    color: isCurrentLesson ? Colors.white : Colors.black,
+                                    fontWeight: isCurrentLesson ? FontWeight.bold : FontWeight.normal,
                                   ),
                                   textAlign: TextAlign.left,
                                 ),
@@ -63,23 +74,40 @@ class LessonCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 13.0),
                               Flexible(
-                                child: Text(
-                                  lesson.group!=null ? '(${lesson.group}) ${lesson.label}' : lesson.label,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      if (lesson.group != null && lesson.group!.isNotEmpty)
+                                        TextSpan(
+                                          text: '(${lesson.group}) ',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color.fromARGB(255, 129, 129, 129),
+                                          ),
+                                        ),
+                                      TextSpan(
+                                        text: lesson.label,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: isCurrentLesson ? Colors.white : Colors.black,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+
                             ],
                           ),
                         ),
                         Text(
                           lesson.audience,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black,
+                            color: isCurrentLesson ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ],

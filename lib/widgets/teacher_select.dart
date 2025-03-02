@@ -96,55 +96,76 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
     if (_isError) return Center(child: ErrorScreen(onRefresh: _fetchReplacements));
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-              padding: const EdgeInsets.all(0.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ListTile(
-              title: Text(selectedTeacher ?? "Выберите преподавателя", textAlign: TextAlign.left),
-              trailing: const Icon(Icons.arrow_drop_down, size: 30),
-              onTap: _showTeacherSelectionScreen,
-            ),
-            ),
-          const SizedBox(height: 30),
-          if (selectedInstitution?.schedule ?? false)
-            ActionButton(
-              icon: Icons.schedule,
-              label: 'Получить расписание',
-              enabled: selectedTeacher != null,
-              onPressed: () {
-                final teacher = widget.data.firstWhere((t) => t.name == selectedTeacher);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => widget.scheduleScreen(teacher)),
-                );
-              },
-            ),
-          const SizedBox(height: 20),
-          if (selectedInstitution?.replacement ?? false)
-            ActionButton(
-              icon: Icons.update,
-              label: 'Получить замены',
-              enabled: selectedTeacher != null,
-              onPressed: _fetchReplacements,
-            ),
-        ],
+  padding: const EdgeInsets.all(16.0),
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const Text(
+        "Выберите преподавателя: ",
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Color.fromRGBO(103, 103, 103, 1),
+        ),
       ),
-    );
+      const SizedBox(height: 10),
+      GestureDetector(
+        onTap: _showTeacherSelectionScreen,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.grey,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  selectedTeacher ?? "Выберите преподавателя",
+                  style: TextStyle(
+                    color: selectedTeacher != null ? Colors.black : Colors.grey,
+                    fontSize: 16,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 30),
+      if (selectedInstitution?.schedule ?? false)
+        ActionButton(
+          icon: Icons.schedule,
+          label: 'Получить расписание',
+          enabled: selectedTeacher != null,
+          onPressed: () {
+            final teacher = widget.data.firstWhere((t) => t.name == selectedTeacher);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => widget.scheduleScreen(teacher)),
+            );
+          },
+        ),
+      const SizedBox(height: 20),
+      if (selectedInstitution?.replacement ?? false)
+        ActionButton(
+          icon: Icons.update,
+          label: 'Получить замены',
+          enabled: selectedTeacher != null,
+          onPressed: _fetchReplacements,
+        ),
+    ],
+  ),
+);
+
   }
 }
 
@@ -182,7 +203,7 @@ class _TeacherSelectionScreenState extends State<_TeacherSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
       appBar: AppBar(
         title: const Text(
           'Выберите преподавателя',

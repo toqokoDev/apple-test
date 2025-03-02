@@ -1,3 +1,5 @@
+// ignore_for_file: unrelated_type_equality_checks
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,7 +62,7 @@ class ScheduleWatchScreen extends StatelessWidget {
         backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
         appBar: AppBar(
           title: Text(
-            'Расписание для ${schedule.group}',
+            'Расписание для ${schedule.name}',
             style: const TextStyle(
               fontSize: 20,
               color: Colors.black,
@@ -109,7 +111,7 @@ class ScheduleWatchScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: Text(
-                          '${par.number}',
+                          par.name,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -189,11 +191,11 @@ class ReplacementsWatchScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
+                      padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        'Замены на ${day.data}(${day.day})',
+                        'Замены на ${day.data} (${day.day})',
                         style: const TextStyle(
-                          fontSize: 17,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(64, 64, 64, 1),
                         ),
@@ -204,18 +206,19 @@ class ReplacementsWatchScreen extends StatelessWidget {
                     else
                       ReplacementCard(day: day),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
                       child: Text(
-                        'Расписание на “${day.day}” с учетом замен',
-                        style: const TextStyle(
-                          fontSize: 17,
+                        'Обновленное расписание',
+                        style: TextStyle(
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(64, 64, 64, 1),
                         ),
                       ),
                     ),
-                    ScheduleCard(day: day)
+                    if (day.schedule != {})
+                      ScheduleCard(day: day)
                   ],
                 ),
               ),

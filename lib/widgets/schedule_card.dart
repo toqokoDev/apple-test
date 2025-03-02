@@ -26,7 +26,7 @@ class ScheduleCard extends StatelessWidget {
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: par.lessons.map((lesson) {
+                  children: par.lessons.map<Widget>((lesson) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Row(
@@ -54,7 +54,9 @@ class ScheduleCard extends StatelessWidget {
                                 const SizedBox(width: 13.0),
                                 Flexible(
                                   child: Text(
-                                    lesson.group!=null ? '(${lesson.group}) ${lesson.label}' : lesson.label,
+                                    lesson.group != null
+                                        ? '(${lesson.group}) ${lesson.label}'
+                                        : lesson.label,
                                     style: const TextStyle(
                                       fontSize: 16,
                                     ),

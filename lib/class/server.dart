@@ -4,7 +4,7 @@ import 'package:sched_master/class/schedule.dart';
 import 'package:sched_master/class/teacher.dart';
 
 class Server extends ChangeNotifier {
-  Institution institution = Institution(type: "", town: "", id: "0", name: "", replacement: false, schedule: false);
+  Institution institution = Institution(type: "", town: "", id: "0", name: "", timeLesson: 45, replacement: false, history: false, schedule: false);
   List<Teacher> teacher = [];
   List<Schedule> schedule = [];
 

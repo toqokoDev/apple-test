@@ -31,7 +31,7 @@ class ActionButton extends StatelessWidget {
           elevation: 6,
           shadowColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: enabled ? Colors.black : Colors.grey,
+          backgroundColor: enabled ? Colors.black : const Color.fromARGB(255, 138, 138, 138),
         ),
       ),
     );
