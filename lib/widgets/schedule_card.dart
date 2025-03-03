@@ -53,12 +53,26 @@ class ScheduleCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 13.0),
                                 Flexible(
-                                  child: Text(
-                                    lesson.group != null
-                                        ? '(${lesson.group}) ${lesson.label}'
-                                        : lesson.label,
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        if (lesson.group != null && lesson.group!.isNotEmpty)
+                                          TextSpan(
+                                            text: '(${lesson.group}) ',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color.fromARGB(255, 129, 129, 129),
+                                            ),
+                                          ),
+                                        TextSpan(
+                                          text: lesson.label,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),

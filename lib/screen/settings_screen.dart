@@ -108,150 +108,152 @@ class _SettingScreenState extends State<SettingScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Настройки',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        appBar: AppBar(
+          title: const Text(
+            'Настройки',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-      ),
-      backgroundColor: Colors.grey[200],
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if(_selectedInstitution!.replacement)
-              Card(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SwitchListTile(
-                      title: const Text(
-                        'Уведомления о заменах',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      value: _notificationsEnabled,
-                      onChanged: _toggleNotifications,
-                      activeColor: Colors.white,
-                      activeTrackColor: Colors.black,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if(_selectedInstitution!.replacement)
+                  Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SwitchListTile(
+                          title: const Text(
+                            'Уведомления о заменах',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          value: _notificationsEnabled,
+                          onChanged: _toggleNotifications,
+                          activeColor: Colors.white,
+                          activeTrackColor: Colors.black,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                        )
+                      ]
                     )
-                  ]
-                )
-              ),
-            if(_selectedInstitution!.replacement)
-              const SizedBox(height: 20),
-            Card(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 2,
-              child: ListTile(
-                title: const Text(
-                  'Выбранное заведение',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  "${_selectedInstitution!.name} (${_selectedInstitution!.town})",
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.red),
-                  onPressed: _changeInstitution,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            if(_selectedInstitution!.history)
-              Card(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                child: ListTile(
-                  title: const Text(
-                    'История замен',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: const Text(
-                    'Просмотр предыдущих замен в расписании.',
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.history, color: Colors.orange),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HistoryScreen()),
-                      );
-                    },
+                if(_selectedInstitution!.replacement)
+                  const SizedBox(height: 20),
+                Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: ListTile(
+                    title: const Text(
+                      'Выбранное заведение',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      "${_selectedInstitution!.name} (${_selectedInstitution!.town})",
+                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.red),
+                      onPressed: _changeInstitution,
+                    ),
                   ),
                 ),
-              ),
-            if(_selectedInstitution!.history)
-              const SizedBox(height: 20),
-            Card(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 2,
-              child: ListTile(
-                title: const Text(
-                  'О приложении',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text(
-                  'Приложение помогает отслеживать расписание и замены в удобном формате.',
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.info_outline, color: Colors.blue),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.white,
-                          title: const Text('Наши соцсети', textAlign: TextAlign.center),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Подписывайтесь на нас, чтобы быть в курсе всех новостей!',
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                const SizedBox(height: 20),
+                if(_selectedInstitution!.history)
+                  Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 2,
+                    child: ListTile(
+                      title: const Text(
+                        'История замен',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: const Text(
+                        'Просмотр предыдущих замен в расписании.',
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.history, color: Colors.orange),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                if(_selectedInstitution!.history)
+                  const SizedBox(height: 20),
+                Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: ListTile(
+                    title: const Text(
+                      'О приложении',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text(
+                      'Приложение помогает отслеживать расписание и замены в удобном формате.',
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.info_outline, color: Colors.blue),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: Colors.white,
+                              title: const Text('Наши соцсети', textAlign: TextAlign.center),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  IconButton(
-                                    icon: const FaIcon(FontAwesomeIcons.xTwitter, size: 30),
-                                    onPressed: () => launchURL('https://x.com/toqoko'),
+                                  const Text(
+                                    'Подписывайтесь на нас, чтобы быть в курсе всех новостей!',
+                                    textAlign: TextAlign.center,
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.telegram, size: 30),
-                                    onPressed: () => launchURL('https://t.me/sched_master'),
-                                  ),
-                                  IconButton(
-                                    icon: const FaIcon(FontAwesomeIcons.github, size: 30),
-                                    onPressed: () => launchURL('https://github.com/toqokoDev'),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      IconButton(
+                                        icon: const FaIcon(FontAwesomeIcons.xTwitter, size: 30),
+                                        onPressed: () => launchURL('https://x.com/toqoko'),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.telegram, size: 30),
+                                        onPressed: () => launchURL('https://t.me/sched_master'),
+                                      ),
+                                      IconButton(
+                                        icon: const FaIcon(FontAwesomeIcons.github, size: 30),
+                                        onPressed: () => launchURL('https://github.com/toqokoDev'),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        )
     );
   }
 }

@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "404297382123",
+    "firebase_url": "https://sched-master-f29f9-default-rtdb.firebaseio.com",
     "project_id": "sched-master-f29f9",
     "storage_bucket": "sched-master-f29f9.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:404297382123:android:3b99524d454936c60566ae",
+        "mobilesdk_app_id": "1:404297382123:android:e5b263d44170b9630566ae",
         "android_client_info": {
-          "package_name": "com.example.sched_master"
+          "package_name": "com.toqoko.sched_master"
         }
       },
       "oauth_client": [],

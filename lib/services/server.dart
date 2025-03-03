@@ -131,7 +131,7 @@ Future<List<TeacherReplacements>> getTeacherReplacement(String name, Institution
 
     final String responseBody = utf8.decode(response.bodyBytes);
     final List<dynamic> responseData = json.decode(responseBody);
-
+    print(responseData);
     return responseData.map((data) => TeacherReplacements.fromJson(data)).toList();
   } catch (e) {
     throw Exception('Failed to Teacher Replacement load data');

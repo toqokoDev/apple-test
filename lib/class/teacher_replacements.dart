@@ -5,7 +5,7 @@ class ReplacementTeacherDocument {
   final String oldLabel;
   final String newLabel;
   final String newAudience;
-  final List<String> teachers;
+  final String teachers;
 
   ReplacementTeacherDocument({
     required this.number,
@@ -21,7 +21,7 @@ class ReplacementTeacherDocument {
       oldLabel: json['old_label'] as String,
       newLabel: json['new_label'] as String,
       newAudience: json['new_audience'] as String,
-      teachers: json['teachers'] as List<String>,
+      teachers: (json['teachers'] as List<dynamic>).join(", "),
     );
   }
 
@@ -31,7 +31,7 @@ class ReplacementTeacherDocument {
       'old_label': oldLabel,
       'new_label': newLabel,
       'new_audience': newAudience,
-      'teachers': teachers,
+      'teachers': teachers.split(","),
     };
   }
 }
@@ -60,7 +60,9 @@ class TeacherReplacements {
       data: json['data'] as String,
       day: json['day'] as String,
       schedule: Day.fromJson(json['schedule'] as Map<String, dynamic>),
-      replacement: json['replacement'].map((day) => ReplacementTeacherDocument.fromJson(day as Map<String, dynamic>)).toList(),
+      replacement: (json['replacement'] as List<dynamic>)
+          .map((item) => ReplacementTeacherDocument.fromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 

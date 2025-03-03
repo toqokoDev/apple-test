@@ -88,7 +88,7 @@ class LessonCard extends StatelessWidget {
                                       TextSpan(
                                         text: lesson.label,
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
                                           color: isCurrentLesson ? Colors.white : Colors.black,
                                           fontWeight: FontWeight.normal,
                                         ),

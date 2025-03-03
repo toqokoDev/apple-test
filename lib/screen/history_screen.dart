@@ -33,14 +33,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 2,
         title: const Text(
           'История замен',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 20,
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
