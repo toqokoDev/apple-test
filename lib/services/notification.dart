@@ -8,10 +8,6 @@ void setupFirebaseMessaging() {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   messaging.requestPermission();
 
-  messaging.getToken().then((token) {
-    print("FCM Token: $token");
-  });
-
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     showNotification(message);
   });
