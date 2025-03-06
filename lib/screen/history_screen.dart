@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:sched_master/class/institution.dart';
 import 'package:sched_master/class/server.dart';
 import 'package:sched_master/class/replacements_history.dart';
+import 'package:sched_master/constants/ad.dart';
 
 import 'package:sched_master/services/server.dart';
 
 import 'package:sched_master/screen/error_screen.dart';
 import 'package:sched_master/screen/loading_screen.dart';
+import 'package:yandex_mobileads/mobile_ads.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -19,15 +21,54 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   Institution? selectedInstitution;
-  
+  late BannerAd banner;
+  bool isBannerAlreadyCreated = false;
+
   @override
   void initState() {
     super.initState();
     _loadInstitution();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadAd();
+  }
+
   Future<void> _loadInstitution() async {
     selectedInstitution ??= Provider.of<Server>(context, listen: false).institution;
+  }
+
+  _loadAd() async {
+    banner = _createBanner();
+    setState(() {
+      isBannerAlreadyCreated = true;
+    });
+  }
+
+  BannerAdSize _getAdSize() {
+    final screenWidth = MediaQuery.of(context).size.width.round();
+    return BannerAdSize.sticky(width: screenWidth);
+  }
+
+  _createBanner() {
+    return BannerAd(
+      adUnitId: Advertising.bannerID,
+      adSize: _getAdSize(),
+      adRequest: const AdRequest(),
+      onAdLoaded: () {
+        if (!mounted) {
+          banner.destroy();
+          return;
+        }
+      },
+      onAdFailedToLoad: (error) {},
+      onAdClicked: () {},
+      onLeftApplication: () {},
+      onReturnedToApplication: () {},
+      onImpression: (impressionData) {},
+    );
   }
 
   @override
@@ -61,56 +102,68 @@ class _HistoryScreenState extends State<HistoryScreen> {
           }
           
           final replacements = snapshot.data!;
-          return ListView.builder(
-            padding: const EdgeInsets.all(12.0),
-            itemCount: replacements.length,
-            itemBuilder: (context, index) {
-              final day = replacements[index];
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(12.0),
+                  itemCount: replacements.length,
+                  itemBuilder: (context, index) {
+                    final day = replacements[index];
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Card(
-                    color: Colors.white,
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    elevation: 5,
-                    child: ExpansionTile(
-                      tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
-                      title: Text(
-                        'Замены на ${day.data} (${day.day})',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF404040),
-                        ),
-                      ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        Card(
+                          color: Colors.white,
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          elevation: 5,
+                          child: ExpansionTile(
+                            tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
+                            title: Text(
+                              'Замены на ${day.data} (${day.day})',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF404040),
+                              ),
+                            ),
                             children: [
-                              const _TableHeader(),
-                              const Divider(color: Colors.grey, thickness: 1),
-                              ...List.generate(
-                                day.replacement.length,
-                                (i) => _ReplacementRow(
-                                  replacement: day.replacement[i],
-                                  previousGroup: i > 0 ? day.replacement[i - 1].group : null,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const _TableHeader(),
+                                    const Divider(color: Colors.grey, thickness: 1),
+                                    ...List.generate(
+                                      day.replacement.length,
+                                      (i) => _ReplacementRow(
+                                        replacement: day.replacement[i],
+                                        previousGroup: i > 0 ? day.replacement[i - 1].group : null,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
-              );
-            },
+                    );
+                  },
+                ),
+              ),
+              if (isBannerAlreadyCreated)
+                Container(
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  child: AdWidget(bannerAd: banner,),
+                ),
+            ],
           );
         },
       ),

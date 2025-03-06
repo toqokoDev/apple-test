@@ -9,10 +9,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sched_master/class/server.dart';
 import 'package:sched_master/screen/main_screen.dart';
 import 'package:sched_master/screen/institution_screen.dart';
+import 'package:yandex_mobileads/mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await MobileAds.initialize();
 
   setupFirebaseMessaging();
 
@@ -26,7 +28,7 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? selectedInstitution = prefs.getString('selectedInstitutionID');
-
+  
   runApp(
     MultiProvider(
       providers: [
