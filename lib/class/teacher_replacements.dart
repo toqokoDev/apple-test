@@ -5,14 +5,14 @@ class ReplacementTeacherDocument {
   final String oldLabel;
   final String newLabel;
   final String newAudience;
-  final String teachers;
+  final String group;
 
   ReplacementTeacherDocument({
     required this.number,
     required this.oldLabel,
     required this.newLabel,
     required this.newAudience,
-    required this.teachers,
+    required this.group,
   });
 
   factory ReplacementTeacherDocument.fromJson(Map<String, dynamic> json) {
@@ -21,7 +21,7 @@ class ReplacementTeacherDocument {
       oldLabel: json['old_label'] as String,
       newLabel: json['new_label'] as String,
       newAudience: json['new_audience'] as String,
-      teachers: (json['teachers'] as List<dynamic>).join(", "),
+      group: json['group'] as String,
     );
   }
 
@@ -31,7 +31,7 @@ class ReplacementTeacherDocument {
       'old_label': oldLabel,
       'new_label': newLabel,
       'new_audience': newAudience,
-      'teachers': teachers.split(","),
+      'group': group,
     };
   }
 }

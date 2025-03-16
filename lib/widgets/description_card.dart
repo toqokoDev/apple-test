@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sched_master/class/theme_provider.dart';
 
 class DescriptionCard extends StatelessWidget {
   final String description;
@@ -7,10 +9,12 @@ class DescriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return SizedBox(
       width: double.infinity,
       child: Card(
-        color: Colors.white,
+        color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
@@ -21,9 +25,9 @@ class DescriptionCard extends StatelessWidget {
           child: Text(
             description,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black,
+              color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
             ),
           ),
         ),

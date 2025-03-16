@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sched_master/class/theme_provider.dart';
 
 class ReplacementCard extends StatelessWidget {
   final dynamic day;
@@ -7,8 +9,10 @@ class ReplacementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Card(
-      color: Colors.white,
+      color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -19,7 +23,7 @@ class ReplacementCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
@@ -30,7 +34,7 @@ class ReplacementCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(155, 155, 155, 1),
+                      color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromRGBO(155, 155, 155, 1),
                     ),
                   ),
                 ),
@@ -42,7 +46,7 @@ class ReplacementCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(155, 155, 155, 1),
+                      color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromRGBO(155, 155, 155, 1),
                     ),
                   ),
                 ),
@@ -54,7 +58,7 @@ class ReplacementCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(155, 155, 155, 1),
+                      color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromRGBO(155, 155, 155, 1),
                     ),
                   ),
                 ),
@@ -66,14 +70,14 @@ class ReplacementCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(155, 155, 155, 1),
+                      color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromRGBO(155, 155, 155, 1),
                     ),
                   ),
                 ),
               ],
             ),
-            const Divider(
-              color: Color.fromRGBO(194, 194, 194, 1),
+            Divider(
+              color: themeProvider.isDarkTheme ? Colors.grey[600] : const Color.fromRGBO(194, 194, 194, 1),
               thickness: 1,
             ),
             Column(
@@ -91,9 +95,9 @@ class ReplacementCard extends StatelessWidget {
                             child: Text(
                               replacement.number,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -102,9 +106,9 @@ class ReplacementCard extends StatelessWidget {
                             child: Text(
                               replacement.newLabel,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -113,9 +117,9 @@ class ReplacementCard extends StatelessWidget {
                             child: Text(
                               replacement.oldLabel,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -124,9 +128,9 @@ class ReplacementCard extends StatelessWidget {
                             child: Text(
                               replacement.newAudience,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -134,8 +138,8 @@ class ReplacementCard extends StatelessWidget {
                       ),
                     ),
                     if (index != day.replacement.length - 1)
-                      const Divider(
-                        color: Color.fromRGBO(219, 219, 220, 1),
+                      Divider(
+                        color: themeProvider.isDarkTheme ? Colors.grey[600] : const Color.fromRGBO(219, 219, 220, 1),
                         thickness: 1,
                       ),
                   ],

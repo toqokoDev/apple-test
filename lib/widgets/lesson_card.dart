@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sched_master/class/theme_provider.dart';
 
 class LessonCard extends StatelessWidget {
   final List<dynamic> lessons;
@@ -14,8 +16,10 @@ class LessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Card(
-      color: Colors.white,
+      color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -60,7 +64,11 @@ class LessonCard extends StatelessWidget {
                                   lesson.time,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: isCurrentLesson ? Colors.white : Colors.black,
+                                    color: isCurrentLesson
+                                        ? Colors.white
+                                        : themeProvider.isDarkTheme
+                                            ? Colors.white
+                                            : Colors.black,
                                     fontWeight: isCurrentLesson ? FontWeight.bold : FontWeight.normal,
                                   ),
                                   textAlign: TextAlign.left,
@@ -70,7 +78,7 @@ class LessonCard extends StatelessWidget {
                               Container(
                                 width: 2.0,
                                 height: 20.0,
-                                color: const Color.fromRGBO(194, 194, 194, 1),
+                                color: themeProvider.isDarkTheme ? Colors.grey[600] : const Color.fromRGBO(194, 194, 194, 1),
                               ),
                               const SizedBox(width: 13.0),
                               Flexible(
@@ -80,16 +88,20 @@ class LessonCard extends StatelessWidget {
                                       if (lesson.group != null && lesson.group!.isNotEmpty)
                                         TextSpan(
                                           text: '(${lesson.group}) ',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
-                                            color: Color.fromARGB(255, 129, 129, 129),
+                                            color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromARGB(255, 129, 129, 129),
                                           ),
                                         ),
                                       TextSpan(
                                         text: lesson.label,
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: isCurrentLesson ? Colors.white : Colors.black,
+                                          color: isCurrentLesson
+                                              ? Colors.white
+                                              : themeProvider.isDarkTheme
+                                                  ? Colors.white
+                                                  : Colors.black,
                                           fontWeight: FontWeight.normal,
                                         ),
                                       ),
@@ -98,7 +110,6 @@ class LessonCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-
                             ],
                           ),
                         ),
@@ -106,7 +117,11 @@ class LessonCard extends StatelessWidget {
                           lesson.audience,
                           style: TextStyle(
                             fontSize: 14,
-                            color: isCurrentLesson ? Colors.white : Colors.black,
+                            color: isCurrentLesson
+                                ? Colors.white
+                                : themeProvider.isDarkTheme
+                                    ? Colors.white
+                                    : Colors.black,
                             fontWeight: FontWeight.normal,
                           ),
                         ),

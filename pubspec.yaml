@@ -1,7 +1,7 @@
 name: sched_master
 description: "Sched Master by toqoko"
 publish_to: 'none'
-version: 1.0.1+2
+version: 1.2.1+4
 
 environment:
   sdk: ^3.5.3
@@ -23,6 +23,8 @@ dependencies:
   yandex_mobileads: ^7.9.1
 
 dev_dependencies:
+  hive_generator: ^2.0.0
+  build_runner: ^2.4.15
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
@@ -38,7 +40,9 @@ flutter:
   - assets/icons/active/student.png
   - assets/icons/active/teacher.png
   - assets/icons/active/settings.png
+  - assets/icons/active/favorite.png
   - assets/icons/state/student.png
   - assets/icons/state/teacher.png
   - assets/icons/state/settings.png
+  - assets/icons/state/favorite.png
   - assets/error.png

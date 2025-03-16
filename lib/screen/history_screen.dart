@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sched_master/class/institution.dart';
 import 'package:sched_master/class/server.dart';
 import 'package:sched_master/class/replacements_history.dart';
+import 'package:sched_master/class/theme_provider.dart';
 import 'package:sched_master/constants/ad.dart';
 
 import 'package:sched_master/services/server.dart';
@@ -73,21 +74,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
+        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
+        title: Text(
           'История замен',
           style: TextStyle(
             fontSize: 20,
-            color: Colors.black,
+            color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black),
+            icon: Icon(Icons.refresh, color: themeProvider.isDarkTheme ? Colors.white : Colors.black),
             onPressed: () => _refresh(context),
           ),
         ],
@@ -100,7 +103,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
             return ErrorScreen(onRefresh: () => _refresh(context));
           }
-          
+
           final replacements = snapshot.data!;
           return Column(
             children: [
@@ -115,7 +118,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Card(
-                          color: Colors.white,
+                          color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
@@ -125,10 +128,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
                             title: Text(
                               'Замены на ${day.data} (${day.day})',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF404040),
+                                color: themeProvider.isDarkTheme ? Colors.white : const Color(0xFF404040),
                               ),
                             ),
                             children: [
@@ -138,7 +141,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const _TableHeader(),
-                                    const Divider(color: Colors.grey, thickness: 1),
+                                    Divider(color: themeProvider.isDarkTheme ? Colors.grey[600] : Colors.grey, thickness: 1),
                                     ...List.generate(
                                       day.replacement.length,
                                       (i) => _ReplacementRow(
@@ -161,7 +164,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  child: AdWidget(bannerAd: banner,),
+                  child: AdWidget(bannerAd: banner),
                 ),
             ],
           );
@@ -200,15 +203,17 @@ class _HeaderCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Expanded(
       flex: flex,
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.bold,
-          color: Color.fromRGBO(155, 155, 155, 1),
+          color: themeProvider.isDarkTheme ? Colors.white70 : const Color.fromRGBO(155, 155, 155, 1),
         ),
       ),
     );
@@ -223,14 +228,16 @@ class _ReplacementRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool shouldShowBorder = previousGroup != null && 
-                            previousGroup != replacement.group && 
-                            replacement.group != '-//-';
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    bool shouldShowBorder = previousGroup != null &&
+        previousGroup != replacement.group &&
+        replacement.group != '-//-';
 
     return Column(
       children: [
         if (shouldShowBorder)
-          const Divider(color: Colors.grey, thickness: 1),
+          Divider(color: themeProvider.isDarkTheme ? Colors.grey[600] : Colors.grey, thickness: 1),
         Row(
           children: [
             _CellText(content: replacement.group, flex: 2),
@@ -244,7 +251,6 @@ class _ReplacementRow extends StatelessWidget {
   }
 }
 
-
 class _CellText extends StatelessWidget {
   final String content;
   final int flex;
@@ -253,15 +259,17 @@ class _CellText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Expanded(
       flex: flex,
       child: Text(
         content,
         textAlign: TextAlign.center,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
-          color: Colors.black,
+          color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
         ),
       ),
     );

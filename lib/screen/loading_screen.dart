@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:sched_master/class/theme_provider.dart';
 import 'package:sched_master/widgets/dot.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -70,8 +71,10 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -85,7 +88,11 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
                     opacity: _animations[index].value,
                     child: SlideTransition(
                       position: _positionAnimations[index],
-                      child: const Dot(size: 10.0, color: Colors.black, opacity: 1.0),
+                      child: Dot(
+                        size: 10.0,
+                        color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                        opacity: 1.0,
+                      ),
                     ),
                   ),
                 );

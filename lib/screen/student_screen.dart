@@ -1,11 +1,10 @@
-// ignore_for_file: unrelated_type_equality_checks
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:sched_master/class/schedule.dart';
 import 'package:sched_master/class/server.dart';
 import 'package:sched_master/class/replacements.dart';
+import 'package:sched_master/class/theme_provider.dart';
 
 import 'package:sched_master/widgets/lesson_card.dart';
 import 'package:sched_master/widgets/schedule_card.dart';
@@ -23,22 +22,24 @@ class StudentScreen extends StatefulWidget {
 class _StudentScreenState extends State<StudentScreen> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final scheduleData = Provider.of<Server>(context).schedule;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
+        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
+        title: Text(
           'Учащимся',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
+            color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
           ),
         ),
       ),
-      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
       body: DropDownStudent(
-        data: scheduleData, 
+        data: scheduleData,
         scheduleScreen: (scheduleData) => ScheduleWatchScreen(scheduleData),
         replacementsScreen: (replacementsData) => ReplacementsWatchScreen(replacementsData),
       ),
@@ -53,23 +54,24 @@ class ScheduleWatchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final currentTime = DateTime.now();
     final currentDay = currentTime.weekday;
 
     return DefaultTabController(
       length: schedule.days.length,
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
         appBar: AppBar(
           title: Text(
             'Расписание для ${schedule.name}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
-              color: Colors.black,
+              color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(50.0),
             child: Padding(
@@ -83,8 +85,8 @@ class ScheduleWatchScreen extends StatelessWidget {
                     indicator: const BoxDecoration(
                       color: Colors.transparent,
                     ),
-                    labelColor: Colors.black,
-                    unselectedLabelColor: const Color.fromARGB(255, 132, 132, 132),
+                    labelColor: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                    unselectedLabelColor: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromARGB(255, 132, 132, 132),
                     labelStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -112,10 +114,10 @@ class ScheduleWatchScreen extends StatelessWidget {
                         padding: const EdgeInsets.only(left: 16.0),
                         child: Text(
                           par.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(64, 64, 64, 1),
+                            color: themeProvider.isDarkTheme ? Colors.white : const Color.fromRGBO(64, 64, 64, 1),
                           ),
                         ),
                       ),
@@ -143,20 +145,22 @@ class ReplacementsWatchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return DefaultTabController(
       length: replacements.length,
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
         appBar: AppBar(
           title: Text(
             'Замены для ${replacements[0].group}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
-              color: Colors.black,
+              color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(50.0),
             child: Padding(
@@ -170,8 +174,8 @@ class ReplacementsWatchScreen extends StatelessWidget {
                     indicator: const BoxDecoration(
                       color: Colors.transparent,
                     ),
-                    labelColor: Colors.black,
-                    unselectedLabelColor: const Color.fromARGB(255, 132, 132, 132),
+                    labelColor: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                    unselectedLabelColor: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromARGB(255, 132, 132, 132),
                     labelStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -194,10 +198,10 @@ class ReplacementsWatchScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
                         'Замены на ${day.data} (${day.day})',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(64, 64, 64, 1),
+                          color: themeProvider.isDarkTheme ? Colors.white : const Color.fromRGBO(64, 64, 64, 1),
                         ),
                       ),
                     ),
@@ -206,18 +210,19 @@ class ReplacementsWatchScreen extends StatelessWidget {
                     else
                       ReplacementCard(day: day),
                     const SizedBox(height: 20),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        'Обновленное расписание',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(64, 64, 64, 1),
+                    if (day.schedule.pars.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          'Обновленное расписание',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: themeProvider.isDarkTheme ? Colors.white : const Color.fromRGBO(64, 64, 64, 1),
+                          ),
                         ),
                       ),
-                    ),
-                    if (day.schedule != {})
+                    if (day.schedule.pars.isNotEmpty)
                       ScheduleCard(day: day)
                   ],
                 ),

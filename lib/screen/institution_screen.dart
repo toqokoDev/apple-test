@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:sched_master/class/institution.dart';
+import 'package:sched_master/class/theme_provider.dart';
 import 'package:sched_master/screen/error_screen.dart';
 import 'package:sched_master/screen/loading_screen.dart';
 import 'package:sched_master/services/server.dart';
@@ -37,11 +39,17 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-      
+
       final notificationQueue = Hive.box<bool>('notificationQueue');
-    
+
       if (notificationQueue.isNotEmpty) {
         notificationQueue.clear();
+      }
+
+      final favorites = Hive.box('favorites');
+
+      if (favorites.isNotEmpty) {
+        favorites.clear();
       }
 
       await sendDeleteRequestToServer();
@@ -84,64 +92,66 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     if (isLoading) {
       return const LoadingScreen();
     } else if (hasError) {
       return ErrorScreen(onRefresh: loadInstitutionsData);
     } else {
       return Scaffold(
-        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
         appBar: AppBar(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Выберите заведение',
                 style: TextStyle(
-                fontFamily: 'Roboto',
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
+                  fontFamily: 'Roboto',
+                  color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.info, color: Colors.black, size: 30.0),
+                icon: Icon(Icons.info, color: themeProvider.isDarkTheme ? Colors.white : Colors.black, size: 30.0),
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        backgroundColor: Colors.white,
+                        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        title: const Text(
+                        title: Text(
                           'Не нашли заведение?',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: themeProvider.isDarkTheme ? Colors.white : Colors.black),
                           textAlign: TextAlign.center,
                         ),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Text(
                                 'Напишите нам в Telegram, и мы добавим его!',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16, color: Colors.black87),
+                                style: TextStyle(fontSize: 16, color: themeProvider.isDarkTheme ? Colors.white70 : Colors.black87),
                               ),
                             ),
                             const SizedBox(height: 10),
                             Column(
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.telegram, color: Colors.blueAccent, size: 50.0),
+                                  icon: Icon(Icons.telegram, color: themeProvider.isDarkTheme ? Colors.blue[300] : Colors.blueAccent, size: 50.0),
                                   onPressed: () => launchURL('https://t.me/sched_master'),
                                 ),
-                                const Text(
+                                Text(
                                   'Связаться в Telegram',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black54),
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: themeProvider.isDarkTheme ? Colors.white70 : Colors.black54),
                                 ),
                               ],
                             ),
@@ -151,7 +161,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                           TextButton(
                             onPressed: () => Navigator.pop(context),
                             style: TextButton.styleFrom(
-                              foregroundColor: Colors.black,
+                              foregroundColor: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                               textStyle: const TextStyle(fontSize: 16),
                             ),
                             child: const Text('Закрыть'),
@@ -164,7 +174,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
               ),
             ],
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
           elevation: 0.5,
         ),
         body: Padding(
@@ -177,9 +187,9 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                 onChanged: filterSearchResults,
                 decoration: InputDecoration(
                   hintText: 'Поиск...',
-                  hintStyle: TextStyle(fontFamily: 'Roboto', color: Colors.grey[600]),
+                  hintStyle: TextStyle(fontFamily: 'Roboto', color: themeProvider.isDarkTheme ? Colors.white70 : Colors.grey[600]),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -187,7 +197,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                   ),
                   suffixIcon: searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: Icon(Icons.clear, color: Colors.grey[600]),
+                          icon: Icon(Icons.clear, color: themeProvider.isDarkTheme ? Colors.white70 : Colors.grey[600]),
                           onPressed: clearSearch,
                         )
                       : null,
@@ -204,15 +214,16 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          selectedInstitution =
-                              isSelected ? null : institution;
+                          selectedInstitution = isSelected ? null : institution;
                         });
                       },
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isSelected ?const Color.fromARGB(255, 100, 142, 161) : Colors.white,
+                          color: isSelected
+                              ? themeProvider.isDarkTheme ? Colors.blueGrey[800] : const Color.fromARGB(255, 100, 142, 161)
+                              : themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -224,7 +235,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                                 fontFamily: 'Roboto',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: isSelected ? Colors.white : Colors.black,
+                                color: isSelected ? Colors.white : themeProvider.isDarkTheme ? Colors.white : Colors.black,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -233,7 +244,7 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                               style: TextStyle(
                                 fontFamily: 'Roboto',
                                 fontSize: 14,
-                                color: isSelected ? Colors.white70 : Colors.grey[600],
+                                color: isSelected ? Colors.white70 : themeProvider.isDarkTheme ? Colors.white70 : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -254,7 +265,9 @@ class _SelectInstitutionScreenState extends State<SelectInstitutionScreen> {
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: selectedInstitution != null ? Colors.black : Colors.grey[400],
+                    backgroundColor: selectedInstitution != null
+                        ? themeProvider.isDarkTheme ? Colors.blueGrey[800] : Colors.black
+                        : themeProvider.isDarkTheme ? Colors.grey[700] : Colors.grey[400],
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

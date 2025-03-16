@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sched_master/class/theme_provider.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String label;
@@ -10,7 +12,7 @@ class CustomDropdown extends StatelessWidget {
   const CustomDropdown({
     super.key,
     required this.label,
-    this.value, // По умолчанию null (ничего не выбрано)
+    this.value,
     required this.items,
     required this.onChanged,
     this.enabled = true,
@@ -18,15 +20,17 @@ class CustomDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color.fromRGBO(103, 103, 103, 1),
+            color: themeProvider.isDarkTheme ? Colors.white70 : const Color.fromRGBO(103, 103, 103, 1),
           ),
         ),
         const SizedBox(height: 6),
@@ -36,24 +40,38 @@ class CustomDropdown extends StatelessWidget {
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.grey, width: 1),
+              borderSide: const BorderSide(
+                color: Colors.grey,
+                width: 1,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.grey, width: 1),
+              borderSide: const BorderSide(
+                color: Colors.grey,
+                width: 1,
+              ),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.grey, width: 1),
+              borderSide: const BorderSide(
+                color: Colors.grey,
+                width: 1,
+              ),
             ),
           ),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-          hint: Text( 
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: themeProvider.isDarkTheme ? Colors.white70 : Colors.grey,
+          ),
+          hint: Text(
             label.replaceAll(":", ""),
-            style: const TextStyle(color: Colors.grey),
+            style: TextStyle(
+              color: themeProvider.isDarkTheme ? Colors.white70 : Colors.grey,
+            ),
           ),
           onChanged: enabled ? onChanged : null,
           items: items.map((item) {
@@ -61,11 +79,15 @@ class CustomDropdown extends StatelessWidget {
               value: item,
               child: Text(
                 item,
-                style: TextStyle(color: enabled ? Colors.black : Colors.grey),
+                style: TextStyle(
+                  color: enabled
+                      ? themeProvider.isDarkTheme ? Colors.white : Colors.black
+                      : Colors.grey,
+                ),
               ),
             );
           }).toList(),
-          dropdownColor: Colors.white,
+          dropdownColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
         ),
       ],
     );

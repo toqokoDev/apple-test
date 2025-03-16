@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sched_master/class/favorite.dart';
+import 'package:sched_master/class/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sched_master/class/institution.dart';
@@ -32,6 +35,7 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
   bool _isLoading = false;
   bool _isError = false;
   Institution? selectedInstitution;
+  final Box _favoritesBox = Hive.box('favorites');
 
   @override
   void initState() {
@@ -57,7 +61,10 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
 
   Future<void> _fetchReplacements() async {
     if (selectedTeacher == null || selectedInstitution == null) return;
-    setState(() {_isLoading = true; _isError = false;});
+    setState(() {
+      _isLoading = true;
+      _isError = false;
+    });
 
     try {
       final replacements = await getTeacherReplacement(selectedTeacher!, selectedInstitution!);
@@ -75,11 +82,14 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
   }
 
   void _showTeacherSelectionScreen() {
+    List<Teacher> sortedTeachers = List.from(widget.data);
+    sortedTeachers.sort((a, b) => a.name.compareTo(b.name));
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => _TeacherSelectionScreen(
-          teachers: widget.data,
+          teachers: sortedTeachers,
           initialSelection: selectedTeacher,
           onSelected: (teacher) {
             setState(() => selectedTeacher = teacher.name);
@@ -90,10 +100,30 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
     );
   }
 
+  void _toggleFavorite() {
+    if (selectedTeacher == null) return;
+
+    final person = Favorite(name: selectedTeacher!, isTeacher: true);
+    final isFavorite = _favoritesBox.values.any((item) => item.name == selectedTeacher);
+
+    if (isFavorite) {
+      final key = _favoritesBox.keys.firstWhere((key) => _favoritesBox.get(key).name == selectedTeacher);
+      _favoritesBox.delete(key);
+    } else {
+      _favoritesBox.add(person);
+    }
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     if (_isLoading) return const Center(child: LoadingScreen());
     if (_isError) return Center(child: ErrorScreen(onRefresh: _fetchReplacements));
+
+    final isFavorite = selectedTeacher != null && _favoritesBox.values.any((item) => item.name == selectedTeacher);
 
     return SingleChildScrollView(
       child: Padding(
@@ -102,12 +132,12 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               "Выберите преподавателя: ",
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Color.fromRGBO(103, 103, 103, 1),
+                color: themeProvider.isDarkTheme ? Colors.white70 : const Color.fromRGBO(103, 103, 103, 1),
               ),
             ),
             const SizedBox(height: 10),
@@ -116,7 +146,7 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Colors.grey,
@@ -130,18 +160,57 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
                       child: Text(
                         selectedTeacher ?? "Выберите преподавателя",
                         style: TextStyle(
-                          color: selectedTeacher != null ? Colors.black : Colors.grey,
+                          color: selectedTeacher != null
+                              ? themeProvider.isDarkTheme ? Colors.white : Colors.black
+                              : Colors.grey,
                           fontSize: 16,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: themeProvider.isDarkTheme ? Colors.white70 : Colors.grey),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
+
+            if (selectedTeacher != null) 
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 15),
+                decoration: BoxDecoration(
+                  color: isFavorite ? Colors.red[100] : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : Colors.grey[700],
+                  ),
+                  title: Text(
+                    isFavorite ? 'В избранном' : 'Добавить в избранное',
+                    style: TextStyle(
+                      color: isFavorite ? Colors.red[900] : Colors.grey[800],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.grey[600],
+                    size: 16,
+                  ),
+                  onTap: _toggleFavorite,
+                ),
+              ),
+
             if (selectedInstitution?.schedule ?? false)
               ActionButton(
                 icon: Icons.schedule,
@@ -155,7 +224,7 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
                   );
                 },
               ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             if (selectedInstitution?.replacement ?? false)
               ActionButton(
                 icon: Icons.update,
@@ -165,7 +234,7 @@ class _DropDownTeacherState extends State<DropDownTeacher> {
               ),
           ],
         ),
-      )
+      ),
     );
   }
 }
@@ -203,19 +272,21 @@ class _TeacherSelectionScreenState extends State<_TeacherSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      backgroundColor: themeProvider.isDarkTheme ? Colors.grey[900] : const Color.fromRGBO(245, 245, 245, 1),
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Выберите преподавателя',
           style: TextStyle(
             fontFamily: 'Roboto',
-            color: Colors.black,
+            color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
             fontSize: 22,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
         elevation: 0.5,
         centerTitle: true,
       ),
@@ -224,13 +295,13 @@ class _TeacherSelectionScreenState extends State<_TeacherSelectionScreen> {
         child: Column(
           children: [
             TextField(
-                controller: searchController,
-                onChanged: filterSearchResults,
-                decoration: InputDecoration(
+              controller: searchController,
+              onChanged: filterSearchResults,
+              decoration: InputDecoration(
                 hintText: 'Поиск...',
-                hintStyle: TextStyle(fontFamily: 'Roboto', color: Colors.grey[600]),
+                hintStyle: TextStyle(fontFamily: 'Roboto', color: themeProvider.isDarkTheme ? Colors.white70 : Colors.grey[600]),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -242,11 +313,17 @@ class _TeacherSelectionScreenState extends State<_TeacherSelectionScreen> {
             Expanded(
               child: ListView.separated(
                 itemCount: filteredTeachers.length,
-                separatorBuilder: (_, __) => Divider(color: Colors.grey[300]),
+                separatorBuilder: (_, __) => Divider(color: themeProvider.isDarkTheme ? Colors.grey[700] : Colors.grey[300]),
                 itemBuilder: (context, index) {
                   final teacher = filteredTeachers[index];
                   return ListTile(
-                    title: Text(teacher.name, style: const TextStyle(fontSize: 16)),
+                    title: Text(
+                      teacher.name,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                    ),
                     onTap: () {
                       widget.onSelected(teacher);
                       Navigator.pop(context);
