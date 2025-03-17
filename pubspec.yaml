@@ -1,7 +1,7 @@
 name: sched_master
 description: "Sched Master by toqoko"
 publish_to: 'none'
-version: 1.2.1+4
+version: 1.5.0+4
 
 environment:
   sdk: ^3.5.3
