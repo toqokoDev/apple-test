@@ -41,7 +41,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
       body: DropDownTeacher(
         data: scheduleData,
         scheduleScreen: (scheduleData) => TeacherWatchScreen(scheduleData),
-        replacementsScreen: (replacementsData) => ReplacementsWatchScreen(replacementsData),
+        replacementsScreen: (replacementsData) => ReplacementsTeacherWatchScreen(replacementsData),
       ),
     );
   }
@@ -138,10 +138,10 @@ class TeacherWatchScreen extends StatelessWidget {
   }
 }
 
-class ReplacementsWatchScreen extends StatelessWidget {
+class ReplacementsTeacherWatchScreen extends StatelessWidget {
   final List<TeacherReplacements> replacements;
 
-  const ReplacementsWatchScreen(this.replacements, {super.key});
+  const ReplacementsTeacherWatchScreen(this.replacements, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +210,7 @@ class ReplacementsWatchScreen extends StatelessWidget {
                     else
                       ReplacementCard(day: day),
                     const SizedBox(height: 20),
-                    Padding(
+                    if (day.schedule.pars.isNotEmpty) Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
                         'Обновленное расписание',
@@ -221,7 +221,7 @@ class ReplacementsWatchScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    ScheduleCard(day: day)
+                    if (day.schedule.pars.isNotEmpty) ScheduleCard(day: day)
                   ],
                 ),
               ),

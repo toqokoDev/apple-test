@@ -45,4 +45,5 @@ flutter:
   - assets/icons/state/teacher.png
   - assets/icons/state/settings.png
   - assets/icons/state/favorite.png
-  - assets/error.png
+  - assets/error/white.png
+  - assets/error/black.png

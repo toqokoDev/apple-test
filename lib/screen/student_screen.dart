@@ -41,7 +41,7 @@ class _StudentScreenState extends State<StudentScreen> {
       body: DropDownStudent(
         data: scheduleData,
         scheduleScreen: (scheduleData) => ScheduleWatchScreen(scheduleData),
-        replacementsScreen: (replacementsData) => ReplacementsWatchScreen(replacementsData),
+        replacementsScreen: (replacementsData) => ReplacementsGroupWatchScreen(replacementsData),
       ),
     );
   }
@@ -138,10 +138,10 @@ class ScheduleWatchScreen extends StatelessWidget {
   }
 }
 
-class ReplacementsWatchScreen extends StatelessWidget {
+class ReplacementsGroupWatchScreen extends StatelessWidget {
   final List<Replacements> replacements;
 
-  const ReplacementsWatchScreen(this.replacements, {super.key});
+  const ReplacementsGroupWatchScreen(this.replacements, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -222,8 +222,7 @@ class ReplacementsWatchScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (day.schedule.pars.isNotEmpty)
-                      ScheduleCard(day: day)
+                    if (day.schedule.pars.isNotEmpty) ScheduleCard(day: day)
                   ],
                 ),
               ),

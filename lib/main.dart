@@ -28,7 +28,7 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox<bool>('notificationQueue');
   Hive.registerAdapter(FavoriteAdapter());
-  await Hive.openBox('favorites'); // Открытие бокса
+  await Hive.openBox('favorites');
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? selectedInstitution = prefs.getString('selectedInstitutionID');

@@ -59,10 +59,10 @@ class _SettingScreenState extends State<SettingScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('notificationsEnabled', value);
 
-    if (await hasInternetConnection()) {
+    try {
       await sendTokenToServer(value, _selectedInstitution!);
       await _sendQueuedRequests();
-    } else {
+    } catch(e) {
       saveToQueue(value);
     }
   }
@@ -133,23 +133,26 @@ class _SettingScreenState extends State<SettingScreen> {
                 color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SwitchListTile(
-                      title: Text(
-                        'Темная тема',
-                        style: TextStyle(fontSize: 16, color: themeProvider.isDarkTheme ? Colors.white : Colors.black),
-                      ),
+                child: ListTile(
+                  title: Text(
+                    'Темная тема',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  trailing: GestureDetector(
+                    onTap: () {
+                      themeProvider.toggleTheme(!themeProvider.isDarkTheme);
+                    },
+                    child: Switch(
                       value: themeProvider.isDarkTheme,
-                      onChanged: (value) {
-                        themeProvider.toggleTheme(value);
-                      },
+                      onChanged: null,
                       activeColor: themeProvider.isDarkTheme ? Colors.grey[900] : Colors.white,
                       activeTrackColor: themeProvider.isDarkTheme ? Colors.grey : Colors.black,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                    )
-                  ]
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                 )
               ),
               const SizedBox(height: 20),
@@ -158,21 +161,24 @@ class _SettingScreenState extends State<SettingScreen> {
                   color: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SwitchListTile(
-                        title: Text(
-                          'Уведомления о заменах',
-                          style: TextStyle(fontSize: 16, color: themeProvider.isDarkTheme ? Colors.white : Colors.black),
-                        ),
+                  child: ListTile(
+                    title: Text(
+                      'Уведомления о заменах',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    trailing: GestureDetector(
+                      onTap: () => _toggleNotifications(!_notificationsEnabled),
+                      child: Switch(
                         value: _notificationsEnabled,
-                        onChanged: _toggleNotifications,
+                        onChanged: null,
                         activeColor: themeProvider.isDarkTheme ? Colors.grey[900] : Colors.white,
                         activeTrackColor: themeProvider.isDarkTheme ? Colors.grey : Colors.black,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                      )
-                    ]
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   )
                 ),
               if(_selectedInstitution!.replacement)

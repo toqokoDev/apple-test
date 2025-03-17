@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hive/hive.dart';
 import 'package:sched_master/class/favorite.dart';
+import 'package:sched_master/class/theme_provider.dart';
 import 'package:sched_master/constants/ad.dart';
+import 'package:sched_master/widgets/favorite_tile.dart';
 import 'package:yandex_mobileads/mobile_ads.dart';
 import 'package:sched_master/widgets/action_button.dart';
 import 'package:sched_master/widgets/custom_dropdown.dart';
@@ -145,10 +147,24 @@ class _DropDownStudentState extends State<DropDownStudent> {
     setState(() {});
   }
 
+  Future<void> _refreshData() async {
+    setState(() {
+      _isError = false;
+      _isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: LoadingScreen());
-    if (_isError) return Center(child: ErrorScreen(onRefresh: _handleReplacements));
+    if (_isError) return Center(child: ErrorScreen(onRefresh: _refreshData));
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     final types = widget.data.map((item) => item.type).toSet().toList();
     final filteredGroups = widget.data.where((s) => selectedType == null || s.type == selectedType).toList();
@@ -192,43 +208,14 @@ class _DropDownStudentState extends State<DropDownStudent> {
             const SizedBox(height: 20),
             
             if (selectedGroup != null) 
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 15),
-                decoration: BoxDecoration(
-                  color: isFavorite ? Colors.red[100] : Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : Colors.grey[700],
-                  ),
-                  title: Text(
-                    isFavorite ? 'В избранном' : 'Добавить в избранное',
-                    style: TextStyle(
-                      color: isFavorite ? Colors.red[900] : Colors.grey[800],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.grey[600],
-                    size: 16,
-                  ),
-                  onTap: _toggleFavorite,
-                ),
+              FavoriteTile(
+                isFavorite: isFavorite,
+                isDarkTheme: themeProvider.isDarkTheme,
+                onTap: _toggleFavorite,
               ),
 
             if (selectedInstitution?.schedule ?? false) ActionButton(
-              icon: Icons.schedule,
+              icon: Icons.calendar_today,
               label: 'Получить расписание',
               enabled: selectedGroup != null,
               onPressed: () {
