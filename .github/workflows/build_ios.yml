@@ -1,0 +1,33 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main ]  # Запускать при пуше в main
+  workflow_dispatch:    # Разрешить ручной запуск
+
+jobs:
+  build:
+    runs-on: macos-latest  # Виртуальная macOS машина
+
+    steps:
+      # Шаг 1: Клонирование репозитория
+      - uses: actions/checkout@v4
+
+      # Шаг 2: Установка Flutter
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable  # Версия Flutter
+
+      # Шаг 3: Установка зависимостей
+      - run: flutter pub get
+
+      # Шаг 4: Сборка IPA (подписанной)
+      - run: flutter build ipa --release --no-codesign  # Если нет сертификатов
+      # ИЛИ (если есть Apple Developer Account)
+      # - run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+
+      # Шаг 5: Загрузка артефакта (IPA-файла)
+      - uses: actions/upload-artifact@v3
+        with:
+          name: App-IPA
+          path: build/ios/ipa/*.ipa
