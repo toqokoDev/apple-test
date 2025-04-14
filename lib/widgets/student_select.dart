@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:hive/hive.dart';
 import 'package:sched_master/class/favorite.dart';
 import 'package:sched_master/class/theme_provider.dart';
-import 'package:sched_master/constants/ad.dart';
 import 'package:sched_master/widgets/favorite_tile.dart';
-import 'package:yandex_mobileads/mobile_ads.dart';
 import 'package:sched_master/widgets/action_button.dart';
 import 'package:sched_master/widgets/custom_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,8 +38,6 @@ class _DropDownStudentState extends State<DropDownStudent> {
   bool _isLoading = false;
   bool _isError = false;
   Institution? selectedInstitution;
-  late final Future<InterstitialAdLoader> _adLoader;
-  InterstitialAd? _ad;
   final Box _favoritesBox = Hive.box('favorites');
 
   @override
@@ -54,46 +50,6 @@ class _DropDownStudentState extends State<DropDownStudent> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     selectedInstitution ??= Provider.of<Server>(context, listen: false).institution;
-    _adLoader = _createInterstitialAdLoader();
-    _loadInterstitialAd();
-  }
-
-  Future<InterstitialAdLoader> _createInterstitialAdLoader() {
-    return InterstitialAdLoader.create(
-      onAdLoaded: (InterstitialAd interstitialAd) {
-        _ad = interstitialAd;
-      },
-      onAdFailedToLoad: (error) {},
-    );
-  }
-
-  Future<void> _loadInterstitialAd() async {
-    final adLoader = await _adLoader;
-    await adLoader.loadAd(adRequestConfiguration: const AdRequestConfiguration(adUnitId: Advertising.interstitialID));
-  }
-
-  _showAd() async {
-    _ad?.setAdEventListener(
-      eventListener: InterstitialAdEventListener(
-        onAdShown: () {},
-        onAdFailedToShow: (error) {
-          _ad?.destroy();
-          _ad = null;
-
-          _loadInterstitialAd();
-        },
-        onAdClicked: () {},
-        onAdDismissed: () {
-          _ad?.destroy();
-          _ad = null;
-
-          _loadInterstitialAd();
-        },
-        onAdImpression: (impressionData) {},
-      )
-    );
-    await _ad?.show();
-    await _ad?.waitForDismiss();
   }
 
   Future<void> _loadPreferences() async {
@@ -115,8 +71,6 @@ class _DropDownStudentState extends State<DropDownStudent> {
     
     try {
       final replacements = await getReplacement(selectedGroup!, selectedInstitution!);
-
-      await _showAd();
 
       if (mounted) {
         await Navigator.push(
