@@ -82,10 +82,11 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   Future<void> _loadSettings() async {
-    await Future.delayed(const Duration(seconds: 1));
     _selectedInstitution = Provider.of<Server>(context, listen: false).institution;
 
     _loadSettingsStatus();
+
+    await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
       _isLoading = false;

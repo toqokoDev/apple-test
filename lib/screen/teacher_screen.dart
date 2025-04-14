@@ -161,6 +161,54 @@ class ReplacementsTeacherWatchScreen extends StatelessWidget {
             ),
           ),
           backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.info_outline,
+                color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: themeProvider.isDarkTheme ? Colors.grey[800] : Colors.white,
+                      contentPadding: const EdgeInsets.all(16),
+                      title: Text(
+                        'Информация',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      content: SizedBox(
+                        child: Text(
+                          'Замены получаются с сайта. За ошибки приложение ответственности не несет.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          child: Text(
+                            'OK',
+                            style: TextStyle(
+                              color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(50.0),
             child: Padding(

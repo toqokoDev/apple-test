@@ -259,10 +259,25 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 icon: Icon(Icons.update, color: themeProvider.isDarkTheme ? Colors.white : Colors.black),
                 onPressed: onReplacementPressed,
               ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  color: themeProvider.isDarkTheme ? Colors.orange : Colors.red,
+                ),
+                onPressed: () {
+                  _removeFavorite(favorite);
+                },
+              ),
             ],
           ),
         ],
       ),
     );
+  }
+  void _removeFavorite(Favorite favorite) {
+    final key = favoritesBox.keys.firstWhere((key) => favoritesBox.get(key).name == favorite.name);
+    favoritesBox.delete(key);
+
+    setState(() {});
   }
 }

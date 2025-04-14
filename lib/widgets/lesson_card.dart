@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sched_master/class/theme_provider.dart';
 
-class LessonCard extends StatelessWidget {
+class LessonCard extends StatefulWidget {
   final List<dynamic> lessons;
   final DateTime currentTime;
   final bool isCurrentDay;
@@ -13,6 +13,13 @@ class LessonCard extends StatelessWidget {
     required this.currentTime,
     required this.isCurrentDay,
   });
+
+  @override
+  _LessonCardState createState() => _LessonCardState();
+}
+
+class _LessonCardState extends State<LessonCard> {
+  int? _expandedIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -31,103 +38,167 @@ class LessonCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
-              children: lessons.map((lesson) {
+              children: widget.lessons.asMap().entries.map((entry) {
+                final index = entry.key;
+                final lesson = entry.value;
+                final isLast = index == widget.lessons.length - 1;
                 final lessonTime = parseTime(lesson.time.split("-")[0]);
                 final lessonEndTime = lessonTime.add(const Duration(minutes: 45));
-                final currentOnlyTime = DateTime(0, 0, 0, currentTime.hour, currentTime.minute);
+                final currentOnlyTime = DateTime(0, 0, 0, widget.currentTime.hour, widget.currentTime.minute);
                 final isCurrentTime = currentOnlyTime.isAfter(lessonTime) && currentOnlyTime.isBefore(lessonEndTime);
 
-                final isCurrentLesson = isCurrentDay && isCurrentTime;
+                final isCurrentLesson = widget.isCurrentDay && isCurrentTime;
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: isCurrentLesson
-                          ? const LinearGradient(
-                              colors: [Colors.blueAccent, Colors.lightBlue],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            )
-                          : null,
-                      borderRadius: BorderRadius.circular(8.0),
+                return Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (_expandedIndex == index) {
+                            _expandedIndex = null;
+                          } else {
+                            _expandedIndex = index;
+                          }
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: isCurrentLesson
+                              ? const LinearGradient(
+                                  colors: [Colors.blueAccent, Colors.lightBlue],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : null,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: isCurrentLesson ? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0) : null,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    child: Text(
+                                      lesson.time,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isCurrentLesson
+                                            ? Colors.white
+                                            : themeProvider.isDarkTheme
+                                                ? Colors.white
+                                                : Colors.black,
+                                        fontWeight: isCurrentLesson ? FontWeight.bold : FontWeight.normal,
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10.0),
+                                  Container(
+                                    width: 2.0,
+                                    height: 20.0,
+                                    color: themeProvider.isDarkTheme ? Colors.grey[600] : const Color.fromRGBO(194, 194, 194, 1),
+                                  ),
+                                  const SizedBox(width: 13.0),
+                                  Flexible(
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          if (lesson.group != null && lesson.group!.isNotEmpty)
+                                            TextSpan(
+                                              text: '(${lesson.group}) ',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromARGB(255, 129, 129, 129),
+                                              ),
+                                            ),
+                                          TextSpan(
+                                            text: lesson.label,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: isCurrentLesson
+                                                  ? Colors.white
+                                                  : themeProvider.isDarkTheme
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              lesson.audience,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isCurrentLesson
+                                    ? Colors.white
+                                    : themeProvider.isDarkTheme
+                                        ? Colors.white
+                                        : Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    padding: isCurrentLesson ? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0) : null,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Row(
+                    if (_expandedIndex == index && lesson.label != "---")
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: themeProvider.isDarkTheme ? Colors.grey[700] : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(
-                                child: Text(
-                                  lesson.time,
+                              Text(
+                                'Предмет: ${lesson.label}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              if (lesson.group != null && lesson.group!.isNotEmpty)
+                                Text(
+                                  'Группа: ${lesson.group}',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: isCurrentLesson
-                                        ? Colors.white
-                                        : themeProvider.isDarkTheme
-                                            ? Colors.white
-                                            : Colors.black,
-                                    fontWeight: isCurrentLesson ? FontWeight.bold : FontWeight.normal,
+                                    color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                                   ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                              const SizedBox(width: 10.0),
-                              Container(
-                                width: 2.0,
-                                height: 20.0,
-                                color: themeProvider.isDarkTheme ? Colors.grey[600] : const Color.fromRGBO(194, 194, 194, 1),
-                              ),
-                              const SizedBox(width: 13.0),
-                              Flexible(
-                                child: Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      if (lesson.group != null && lesson.group!.isNotEmpty)
-                                        TextSpan(
-                                          text: '(${lesson.group}) ',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: themeProvider.isDarkTheme ? Colors.grey[400] : const Color.fromARGB(255, 129, 129, 129),
-                                          ),
-                                        ),
-                                      TextSpan(
-                                        text: lesson.label,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: isCurrentLesson
-                                              ? Colors.white
-                                              : themeProvider.isDarkTheme
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
+                                )
+                              else 
+                                Text(
+                                  'Преподаватели: ${lesson.teachers}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
+                              if (lesson.audience.isNotEmpty)
+                                Text(
+                                  'Аудитория: ${lesson.audience}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
-                        Text(
-                          lesson.audience,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isCurrentLesson
-                                ? Colors.white
-                                : themeProvider.isDarkTheme
-                                    ? Colors.white
-                                    : Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    if (!isLast) const SizedBox(height: 10.0),
+                  ],
                 );
               }).toList(),
             ),

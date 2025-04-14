@@ -6,11 +6,11 @@ class FavoriteTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const FavoriteTile({
-    Key? key,
+    super.key,
     required this.isFavorite,
     required this.isDarkTheme,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
