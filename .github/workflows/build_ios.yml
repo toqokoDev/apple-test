@@ -17,6 +17,11 @@ jobs:
           channel: stable
 
       - run: flutter pub get
+      - run: |
+          cd ios
+          echo "platform :ios, '13.0'" >> Podfile  # Добавляем платформу
+          pod repo update
+          cd ..
 
       - run: flutter build ipa --release --no-codesign
 
