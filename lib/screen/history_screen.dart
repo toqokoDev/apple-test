@@ -5,13 +5,11 @@ import 'package:sched_master/class/institution.dart';
 import 'package:sched_master/class/server.dart';
 import 'package:sched_master/class/replacements_history.dart';
 import 'package:sched_master/class/theme_provider.dart';
-import 'package:sched_master/constants/ad.dart';
 
 import 'package:sched_master/services/server.dart';
 
 import 'package:sched_master/screen/error_screen.dart';
 import 'package:sched_master/screen/loading_screen.dart';
-import 'package:yandex_mobileads/mobile_ads.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -22,7 +20,6 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   Institution? selectedInstitution;
-  late BannerAd banner;
   bool isBannerAlreadyCreated = false;
 
   @override
@@ -34,42 +31,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadAd();
   }
 
   Future<void> _loadInstitution() async {
     selectedInstitution ??= Provider.of<Server>(context, listen: false).institution;
-  }
-
-  _loadAd() async {
-    banner = _createBanner();
-    setState(() {
-      isBannerAlreadyCreated = true;
-    });
-  }
-
-  BannerAdSize _getAdSize() {
-    final screenWidth = MediaQuery.of(context).size.width.round();
-    return BannerAdSize.sticky(width: screenWidth);
-  }
-
-  _createBanner() {
-    return BannerAd(
-      adUnitId: Advertising.bannerID,
-      adSize: _getAdSize(),
-      adRequest: const AdRequest(),
-      onAdLoaded: () {
-        if (!mounted) {
-          banner.destroy();
-          return;
-        }
-      },
-      onAdFailedToLoad: (error) {},
-      onAdClicked: () {},
-      onLeftApplication: () {},
-      onReturnedToApplication: () {},
-      onImpression: (impressionData) {},
-    );
   }
 
   @override
@@ -160,12 +125,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   },
                 ),
               ),
-              if (isBannerAlreadyCreated)
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  child: AdWidget(bannerAd: banner),
-                ),
             ],
           );
         },
