@@ -23,7 +23,13 @@ jobs:
           pod repo update
           cd ..
 
-      - run: flutter build ipa --release --no-codesign
+      - run: |
+            flutter build ipa --release --no-codesign
+            xcodebuild -exportArchive \
+              -archivePath build/ios/archive/Runner.xcarchive \
+              -exportPath build/ios/ipa \
+              -exportOptionsPlist ios/ExportOptions.plist \
+              -allowProvisioningUpdates
 
       - uses: actions/upload-artifact@v4  # Fixed: Changed from v3 to v4
         with:
