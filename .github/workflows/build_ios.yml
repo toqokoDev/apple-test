@@ -1,4 +1,4 @@
-name: Build iOS Debug IPA
+name: Build iOS IPA
 
 on:
   push:
@@ -12,15 +12,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      - name: Install CocoaPods
-        run: |
+      - run: flutter pub get
+      - run: |
           cd ios
-          pod install
+          echo "platform :ios, '13.0'" >> Podfile  # Добавляем платформу
+          pod repo update
           cd ..
 
       - name: Build Debug IPA (unsigned)
@@ -29,7 +29,7 @@ jobs:
           mkdir Payload
           cp -r build/ios/iphoneos/Runner.app Payload/
           zip -r app.ipa Payload
-
+  
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
         with:
